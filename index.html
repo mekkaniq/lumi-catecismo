@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f3a24">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="Breve Catecismo de Westminster em jogos: estudar, quiz, completar, montar e Modo Classe.">
+<title>Lumi Catecismo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Belleza&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap">
+<style>
+:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+/* Layout: coluna única de app (mobile-first), faixa verde no topo; Modo Classe ocupa a tela toda para projetar */
+:root{
+  --green:#1d5a37;      /* verde IPB (Pantone 357) */
+  --green-deep:#0f3a24;
+  --green-soft:#e3ede6;
+  --gold:#c6912c;       /* ouro (hot stamping da Bíblia) */
+  --gray:#53565a;       /* Cool Gray 11 */
+  --bg:#f5f6f2;
+  --surface:#ffffff;
+  --fg:#1d2420;
+  --muted:#5f6862;
+  --line:#d9ded8;
+  --ok:#2f7d4a; --ok-bg:#e2f1e6;
+  --bad:#b4472e; --bad-bg:#f8e6e0;
+  --wool:#ffffff; --face:#2b2b2b;
+  --band-fg:#f3f6f1;
+  --f-display:"Optima","Optima nova","Belleza","Candara","Segoe UI",sans-serif;
+  --f-body:"Alegreya Sans","Optima","Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --green:#5fae7c;--green-deep:#0c2418;--green-soft:#1c3226;--gold:#e0ad4a;--gray:#a3a8a4;
+  --bg:#0f1712;--surface:#17221b;--fg:#e8eee9;--muted:#9aa79f;--line:#2a3a30;
+  --ok:#6cc48a;--ok-bg:#1b3324;--bad:#ec8a72;--bad-bg:#3a201a;--wool:#eef0ec;--face:#1a1a1a;--band-fg:#eef3ee;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --green:#5fae7c;--green-deep:#0c2418;--green-soft:#1c3226;--gold:#e0ad4a;--gray:#a3a8a4;
+  --bg:#0f1712;--surface:#17221b;--fg:#e8eee9;--muted:#9aa79f;--line:#2a3a30;
+  --ok:#6cc48a;--ok-bg:#1b3324;--bad:#ec8a72;--bad-bg:#3a201a;--wool:#eef0ec;--face:#1a1a1a;--band-fg:#eef3ee;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--f-body);font-size:17px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.wrap{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;font-weight:700;letter-spacing:.005em}
+.eyebrow{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0;font-weight:500}
+
+/* Faixa do topo */
+.band{background:var(--green-deep);color:var(--band-fg)}
+.band .wrap{padding-block:28px 26px;display:flex;gap:18px;align-items:center}
+.band .eyebrow{color:color-mix(in srgb,var(--band-fg) 70%,transparent)}
+.band h1{font-size:clamp(1.7rem,6vw,2.3rem);line-height:1.1;margin:4px 0 6px}
+.band p{margin:0;opacity:.85}
+.bush{width:88px;flex:none}
+.bush .f1{fill:#3f8f5c}.bush .f2{fill:var(--gold)}.bush .bar{fill:var(--gold)}
+.overall{margin-top:14px;height:6px;border-radius:3px;background:color-mix(in srgb,var(--band-fg) 18%,transparent);overflow:hidden}
+.overall i{display:block;height:100%;background:var(--gold);border-radius:3px}
+
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--green-deep);color:var(--band-fg)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--green-deep)}
+.topbar .wrap{display:flex;align-items:center;gap:10px;padding-block:10px;min-height:52px}
+.back{background:none;border:0;padding:6px 8px 6px 0;font-weight:500;color:inherit;display:flex;align-items:center;gap:4px}
+.topbar .tt{font-family:var(--f-display);font-weight:700;font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.topbar .count{font-variant-numeric:tabular-nums;opacity:.8;font-size:.9rem}
+
+main{padding-block:22px 48px;display:flex;flex-direction:column;gap:26px}
+section{display:flex;flex-direction:column;gap:12px}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.sec-h h2{font-size:1.25rem}
+
+/* Lista de lições */
+.lessons{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.lesson{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:14px 2px}
+.lesson:hover .lt{color:var(--green)}
+.num{font-family:var(--f-display);font-size:1.5rem;color:var(--green);font-weight:700;text-align:center;font-variant-numeric:tabular-nums}
+.lt{font-weight:700;font-size:1.05rem;line-height:1.25;display:block}
+.ls{font-size:.88rem;color:var(--muted)}
+.mini{width:64px;height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:6px}
+.mini i{display:block;height:100%;background:var(--gold)}
+.chev{color:var(--muted);font-size:1.3rem}
+
+.continue{display:flex;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;text-align:left;width:100%}
+.continue .lumi{width:62px;flex:none}
+.continue b{display:block;font-family:var(--f-display);font-size:1.1rem}
+
+.tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tool{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:2px;min-width:0}
+.tool b{font-family:var(--f-display);font-size:1.05rem}
+.tool span{font-size:.88rem;color:var(--muted)}
+.tool.primary{background:var(--green);border-color:var(--green);color:#fff}
+.tool.primary span{color:rgba(255,255,255,.82)}
+.tool:hover{border-color:var(--green)}
+
+/* Lista de perguntas da lição */
+.qlist{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.qrow{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:12px 2px}
+.qrow .n{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.9rem}
+.flames{display:inline-flex;gap:2px}
+.flames svg{width:11px;height:14px}
+.flames .on{fill:var(--gold)}.flames .off{fill:var(--line)}
+
+/* Cartão de estudo */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px 20px;display:flex;flex-direction:column;gap:16px}
+.qnum{font-family:var(--f-display);color:var(--green);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:.82rem}
+.qtext{font-family:var(--f-display);font-size:clamp(1.35rem,5vw,1.65rem);line-height:1.25;font-weight:700}
+.atext{font-size:1.12rem;line-height:1.6;max-width:62ch}
+.atext.hidden{color:transparent;text-shadow:0 0 12px color-mix(in srgb,var(--fg) 55%,transparent);user-select:none}
+.refs{font-size:.86rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:12px}
+.refs b{color:var(--fg);font-weight:500}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:10px 18px;font-weight:500;display:inline-flex;align-items:center;gap:8px}
+.btn.solid{background:var(--green);border-color:var(--green);color:#fff}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#1a1405}
+.btn:disabled{opacity:.4;cursor:default}
+.nav{display:flex;justify-content:space-between;gap:10px}
+
+/* Jogo */
+.dots{display:flex;gap:5px}
+.dots i{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.dots i.d{background:var(--gold)}.dots i.c{background:var(--green)}
+.prompt-label{font-size:.85rem;color:var(--muted);margin:0}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;line-height:1.45;font-size:1rem}
+.opt:hover:not(:disabled){border-color:var(--green)}
+.opt.right{border-color:var(--ok);background:var(--ok-bg)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.opt:disabled{cursor:default}
+.fill{font-size:1.12rem;line-height:2.1}
+.blank{display:inline-block;min-width:4.5em;border-bottom:2px solid var(--muted);text-align:center;color:transparent;line-height:1.3}
+.blank.cur{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 14%,transparent);border-radius:4px 4px 0 0}
+.blank.ok{color:var(--green);font-weight:700;border-color:var(--green)}
+.bank{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 14px;font-weight:500;font-size:1rem}
+.chip:hover:not(:disabled){border-color:var(--green)}
+.chip.used{opacity:.25}
+.chip.shake{animation:shake .35s;border-color:var(--bad);background:var(--bad-bg)}
+.chip.long{text-align:left;line-height:1.35;font-weight:400}
+.built{min-height:4em;background:var(--green-soft);border-radius:14px;padding:14px 16px;font-size:1.08rem;line-height:1.55}
+.built:empty::before{content:"Toque nos trechos na ordem certa";color:var(--muted);font-style:italic}
+.built span{animation:pop .25s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes pop{from{opacity:0}to{opacity:1}}
+.miss{font-size:.85rem;color:var(--bad)}
+
+.feedback{position:sticky;bottom:0;background:var(--surface);border-top:3px solid var(--ok);padding-block:14px calc(14px + env(safe-area-inset-bottom,0px));margin-top:auto}
+.feedback.bad{border-top-color:var(--bad)}
+.feedback .wrap{display:flex;gap:14px;align-items:flex-start}
+.feedback .lumi{width:58px;flex:none}
+.feedback .fb{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.feedback h3{font-size:1.2rem;color:var(--ok)}
+.feedback.bad h3{color:var(--bad)}
+.feedback p{margin:0;font-size:.98rem;max-height:30vh;overflow:auto}
+
+.result{text-align:center;align-items:center}
+.result .lumi{width:120px}
+.big{font-family:var(--f-display);font-size:3rem;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums;line-height:1}
+
+/* Modo Classe */
+.class{min-height:calc(100vh - 52px);display:flex;flex-direction:column}
+.class .stage{flex:1;max-width:1100px;margin:0 auto;width:100%;padding-block:4vh;display:flex;flex-direction:column;gap:3vh;justify-content:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.class .qnum{font-size:clamp(.9rem,1.6vw,1.2rem)}
+.class .qtext{font-size:clamp(1.7rem,4.4vw,3.4rem);line-height:1.18}
+.class .atext{font-size:clamp(1.15rem,2.6vw,2rem);max-width:none;line-height:1.45}
+.class .refs{font-size:clamp(.85rem,1.4vw,1.1rem)}
+.class .controls{border-top:1px solid var(--line);background:var(--surface);padding-block:12px calc(12px + env(safe-area-inset-bottom,0px))}
+.class .controls .wrap{max-width:1100px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
+select{font:inherit;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:9px 14px;max-width:100%}
+.hint{font-size:.8rem;color:var(--muted);text-align:center}
+
+.text-body{font-size:1.12rem;line-height:1.7;max-width:62ch}
+.text-body ol{padding-left:1.4em;margin:0;display:flex;flex-direction:column;gap:10px}
+.foot{font-size:.82rem;color:var(--muted);text-align:center;padding-bottom:12px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ===== Breve Catecismo de Westminster — 107 perguntas [pergunta, resposta, referências] ===== */
+const Q=[
+["Qual é o fim principal do homem?","O fim principal do homem é glorificar a Deus, e gozá-lo para sempre.","Rm 11.36; 1Co 10.31; Sl 73.25-26; Is 43.7; Rm 14.7-8; Ef 1.5-6; Is 60.21; 61.3"],
+["Que regra deu Deus para nos dirigir na maneira de o glorificar e gozar?","A Palavra de Deus, que se acha nas Escrituras do Velho e do Novo Testamentos, é a única regra para nos dirigir na maneira de o glorificar e gozar.","Lc 24.27, 44; 2Pe 3.2, 15-16; 2Tm 3.15-17; Lc 16.29-31; Gl 1.8-9; Jo 15.10-11; Is 8.20; Hb 1.1 comparado com Lc 1.1-4 e Jo 20.30-31"],
+["Qual é a coisa principal que as Escrituras nos ensinam?","A coisa principal que as Escrituras nos ensinam é o que o homem deve crer acerca de Deus e o dever que Deus requer do homem.","Jo 5.39; 20.31; Sl 119.105; Rm 15.4; 1Co 10.11"],
+["Quem é Deus?","Deus é espírito, infinito, eterno e imutável em seu ser, sabedoria, poder, santidade, justiça, bondade e verdade.","Jo 4.24; Êx 3.14; Sl 145.3; 90.2; Tg 1.17; Rm 11.33; Gn 17.1; Ap 4.8; Êx 34.6-7"],
+["Há mais de um Deus?","Há só um Deus, o Deus vivo e verdadeiro.","Dt 6.4; 1Co 8.4; Jr 10.10; Jo 17.3"],
+["Quantas pessoas há na Divindade?","Há três pessoas na Divindade: o Pai, o Filho e o Espírito Santo, e estas três são um Deus, da mesma substância, iguais em poder e glória.","Mt 3.16-17; 28.19; 2Co 13.13; Jo 1.1; 3.18; At 5.3-4; Hb 1.3; Jo 10.30"],
+["Que são os decretos de Deus?","Os decretos de Deus são o seu eterno propósito, segundo o conselho da sua vontade, pelo qual, para sua própria glória, Ele predestinou tudo o que acontece.","Rm 11.36; Ef 1.4-6, 11; At 2.23; 17.26; Jo 21.19; Is 44.28; At 13.48; 1Co 2.7; Ef 3.10-11"],
+["Como executa Deus os seus decretos?","Deus executa os seus decretos nas obras da criação e da providência.","Ap 4.11; Dn 4.35; Is 40.26; 14.26-27; 46.9-11; At 4.24"],
+["Qual é a obra da criação?","A obra da criação é aquela pela qual Deus fez todas as coisas do nada, no espaço de seis dias, e tudo muito bem.","Gn 1; Hb 11.3; Sl 33.9; Gn 1.31"],
+["Como criou Deus o homem?","Deus criou o homem macho e fêmea, conforme a sua própria imagem, em conhecimento, retidão e santidade, com domínio sobre as criaturas.","Gn 1.27-28; Cl 3.10; Ef 4.24; Rm 2.14-15; Sl 8.6-8"],
+["Quais são as obras da providência de Deus?","As obras da providência de Deus são a sua maneira muito santa, sábia e poderosa de preservar e governar todas as suas criaturas, e todas as ações delas.","Sl 145.17; 104.10-24; Hb 1.3; Mt 10.29-30; Os 2.6"],
+["Que ato especial de providência exerceu Deus para com o homem no estado em que ele foi criado?","Quando Deus criou o homem, fez com ele um pacto de vida, com a condição de perfeita obediência, proibindo-lhe comer da árvore da ciência do bem e do mal, sob pena de morte.","Gl 3.12; Gn 2.17"],
+["Conservaram-se nossos primeiros pais no estado em que foram criados?","Nossos primeiros pais, sendo deixados à liberdade da sua própria vontade, caíram do estado em que foram criados, pecando contra Deus.","Rm 5.12; Gn 3.6"],
+["Que é pecado?","Pecado é qualquer falta de conformidade com a lei de Deus, ou qualquer transgressão desta lei.","Tg 2.10; 4.17; 1Jo 3.4"],
+["Qual foi o pecado pelo qual nossos primeiros pais caíram do estado em que foram criados?","O pecado pelo qual nossos primeiros pais caíram do estado em que foram criados foi o comerem do fruto proibido.","Gn 3.12-13; Os 6.7"],
+["Caiu todo o gênero humano pela primeira transgressão de Adão?","Visto que o pacto foi feito com Adão não só para ele, mas também para sua posteridade, todo o gênero humano que dele procede por geração ordinária pecou nele e caiu com ele na sua primeira transgressão.","Gn 1.28; At 17.26; 1Co 15.21-22; Rm 5.12-14"],
+["Qual foi o estado a que a queda reduziu o gênero humano?","A queda reduziu o gênero humano a um estado de pecado e miséria.","Rm 5.12"],
+["Em que consiste o estado de pecado em que o homem caiu?","O estado de pecado em que o homem caiu consiste na culpa do primeiro pecado de Adão, na falta de retidão original e na corrupção de toda a sua natureza, o que ordinariamente se chama Pecado Original, juntamente com todas as transgressões atuais que procedem dele.","Rm 5.18-19; Ef 2.1-3; Rm 8.7-8; Sl 51.5"],
+["Qual é a miséria do estado em que o homem caiu?","Todo o gênero humano, pela sua queda, perdeu comunhão com Deus, está debaixo da sua ira e maldição, e assim sujeito a todas as misérias nesta vida, à morte e às penas do Inferno para sempre.","Gn 3.8, 24; Ef 2.3; Rm 6.23; Mt 25.41-46"],
+["Deixou Deus todo o gênero humano perecer no estado de pecado e miséria?","Tendo Deus, unicamente pela sua boa vontade, desde toda a eternidade, escolhido alguns para a vida eterna, entrou com eles em um pacto de graça, para os livrar do estado de pecado e miséria, e trazer a um estado de salvação por meio de um Redentor.","Ef 1.4; Tt 1.2; 3.4-7; Jo 17.6"],
+["Quem é o Redentor dos escolhidos de Deus?","O único Redentor dos escolhidos de Deus é o Senhor Jesus Cristo que, sendo o eterno Filho de Deus, se fez homem, e assim foi e continua a ser Deus e homem em duas naturezas distintas, e uma só pessoa, para sempre.","1Tm 2.5; Jo 1.14; Rm 9.5; Cl 2.9; Hb 13.8"],
+["Como Cristo, sendo o Filho de Deus, se fez homem?","Cristo, o Filho de Deus, fez-se homem tomando um verdadeiro corpo e uma alma racional, sendo concebido pelo poder do Espírito Santo no ventre da virgem Maria, e nascido dela, mas sem pecado.","Hb 2.14; Mt 26.38; Lc 2.52; 1.31, 35; Hb 4.15"],
+["Que funções exerce Cristo como nosso Redentor?","Cristo, como nosso Redentor, exerce as funções de profeta, sacerdote e rei, tanto no seu estado de humilhação como no de exaltação.","At 3.22; Hb 5.5-6; Sl 2.6; Jo 1.49"],
+["Como exerce Cristo as funções de profeta?","Cristo exerce as funções de profeta, revelando-nos, pela sua Palavra e pelo seu Espírito, a vontade de Deus para a nossa salvação.","Jo 1.18; Hb 1.1-2; Jo 14.26; 16.13"],
+["Como exerce Cristo as funções de sacerdote?","Cristo exerce as funções de sacerdote, oferecendo-se a si mesmo uma vez em sacrifício, para satisfazer a justiça divina, reconciliar-nos com Deus, e fazendo contínua intercessão por nós.","Hb 9.28; Rm 3.24-26; 10.4; Hb 2.17; 7.25; Is 53.12"],
+["Como exerce Cristo as funções de rei?","Cristo exerce as funções de rei, sujeitando-nos a si mesmo, governando-nos e protegendo-nos, contendo e subjugando todos os seus e os nossos inimigos.","Sl 110.3; At 2.36; 18.9-10; Is 9.6-7; 1Co 15.26-27"],
+["Em que consistiu a humilhação de Cristo?","A humilhação de Cristo consistiu em Ele nascer, e isso em condição baixa, feito sujeito à lei; em sofrer as misérias desta vida, a ira de Deus e a amaldiçoada morte na cruz; em ser sepultado e permanecer debaixo do poder da morte durante certo tempo.","Lc 2.7; Fp 2.6-8; Gl 4.4; 3.13; Is 53.3; Mt 27.43; 1Co 15.3-4"],
+["Em que consiste a exaltação de Cristo?","A exaltação de Cristo consiste em Ele ressurgir dos mortos no terceiro dia, em subir ao Céu e estar sentado à mão direita de Deus Pai, e em vir para julgar o mundo no último dia.","1Co 15.4; Ef 1.20-21; At 17.31"],
+["Como nos tornamos participantes da redenção adquirida por Cristo?","Tornamo-nos participantes da redenção adquirida por Cristo pela eficaz aplicação dela a nós pelo seu Santo Espírito.","Jo 1.12; 3.5-6; Tt 3.5-6"],
+["Como nos aplica o Espírito a redenção adquirida por Cristo?","O Espírito aplica-nos a redenção adquirida por Cristo, operando em nós a fé, e unindo-nos a Cristo por meio dela em nossa vocação eficaz.","Gl 2.20; Ef 2.8; 1Co 12.12-13"],
+["Que é vocação eficaz?","Vocação eficaz é a obra do Espírito Santo pela qual, convencendo-nos do nosso pecado e da nossa miséria, iluminando nossos entendimentos pelo conhecimento de Cristo e renovando a nossa vontade, nos persuade e habilita a abraçar Jesus Cristo, que nos é oferecido de graça no Evangelho.","1Ts 2.13; At 2.37; 26.18; Ez 36.25-27; 2Tm 1.9; Fp 2.13; Jo 6.37, 44-45"],
+["Que bênçãos gozam nesta vida aqueles que são eficazmente chamados?","Aqueles que são eficazmente chamados gozam, nesta vida, da justificação, adoção e santificação, e das diversas bênçãos que acompanham estas graças ou delas procedem.","Rm 8.30; Ef 1.5; 1Co 1.30"],
+["Que é justificação?","Justificação é um ato da livre graça de Deus, no qual Ele perdoa todos os nossos pecados e nos aceita como justos diante de si, somente por causa da justiça de Cristo a nós imputada, e recebida só pela fé.","Ef 1.7; 2Co 5.21; Rm 4.6; 5.18; Gl 2.16"],
+["Que é adoção?","Adoção é um ato da livre graça de Deus, pelo qual somos recebidos no número dos filhos de Deus e temos direito a todos os seus privilégios.","1Jo 3.1; Jo 1.12; Rm 8.14-17"],
+["Que é santificação?","Santificação é a obra da livre graça de Deus, pela qual somos renovados em todo o nosso ser, segundo a imagem de Deus, e habilitados a morrer cada vez mais para o pecado e a viver para a retidão.","1Pe 1.2; Ef 4.20-24; Rm 6.6; 12.1-2"],
+["Quais são as bênçãos que nesta vida acompanham a justificação, adoção e santificação, ou delas procedem?","As bênçãos que nesta vida acompanham a justificação, adoção e santificação, ou delas procedem, são: certeza do amor de Deus, paz de consciência, gozo no Espírito Santo, aumento de graça e perseverança nela até ao fim.","Rm 5.1-5; 14.17; Jo 1.16; Fp 1.6; 1Pe 1.5"],
+["Quais são as bênçãos que os fiéis recebem de Cristo na hora da morte?","As almas dos fiéis, na hora da morte, são aperfeiçoadas em santidade e imediatamente entram na glória; e os corpos, que continuam unidos a Cristo, descansam na sepultura até a ressurreição.","Ap 14.13; Lc 23.43; At 7.55, 59; Fp 1.23; 1Ts 4.14; Jo 5.28-29; 14.2-3; Hb 12.22-23"],
+["Quais são as bênçãos que os fiéis recebem de Cristo na ressurreição?","Na ressurreição, os fiéis, sendo ressuscitados em glória, serão publicamente reconhecidos e absolvidos no dia de juízo, e tornados perfeitamente felizes no pleno gozo de Deus por toda a eternidade.","1Co 15.43; Mt 10.32; 25.34; Sl 16.11"],
+["Qual é o dever que Deus exige do homem?","O dever que Deus exige do homem é obediência à sua vontade revelada.","Mq 6.8; Lc 10.27-28; Gn 17.1"],
+["Que revelou Deus primeiramente ao homem para regra de sua obediência?","A regra que Deus revelou primeiramente ao homem para sua obediência foi a lei moral.","Rm 2.14-15"],
+["Onde está a lei moral resumidamente compreendida?","A lei moral está resumidamente compreendida nos dez mandamentos.","Dt 10.4; Mt 19.17-19"],
+["Em que se resumem os dez mandamentos?","Os dez mandamentos se resumem em amar ao Senhor nosso Deus de todo o nosso coração, de toda a nossa alma, de todas as nossas forças e de todo o nosso entendimento; e ao nosso próximo como a nós mesmos.","Mt 22.37-40"],
+["Qual é o prefácio dos dez mandamentos?","O prefácio dos dez mandamentos é: “Eu sou o Senhor teu Deus, que te tirei da terra do Egito, da casa da servidão.”","Êx 20.2"],
+["Que nos ensina o prefácio dos dez mandamentos?","O prefácio dos dez mandamentos ensina-nos que nós temos obrigação de guardar todos os mandamentos de Deus, por ser Ele o Senhor nosso Deus e Redentor.","Dt 11.1; 1Pe 1.15-19"],
+["Qual é o primeiro mandamento?","O primeiro mandamento é: “Não terás outros deuses além de mim.”","Êx 20.3"],
+["Que exige o primeiro mandamento?","O primeiro mandamento exige de nós o conhecer e reconhecer a Deus como o único Deus verdadeiro, e nosso Deus; e como tal adorá-lo.","1Cr 28.9; Dt 26.17; Sl 95.6-7"],
+["Que proíbe o primeiro mandamento?","O primeiro mandamento proíbe o negar, ou deixar de adorar ou glorificar ao verdadeiro Deus, como Deus e nosso Deus; e dar a qualquer outro a adoração e a glória que só a Ele são devidas.","Sl 14.1; Rm 1.20-21, 25; Sl 81.10-11"],
+["Que se nos ensina especialmente pelas palavras “além de mim”, no primeiro mandamento?","As palavras “além de mim”, no primeiro mandamento, ensinam-nos que Deus, que vê todas as coisas, toma conhecimento e muito se ofende do pecado de ter-se em seu lugar outro deus.","Sl 139.1-3; Dt 30.17-18"],
+["Qual é o segundo mandamento?","O segundo mandamento é: “Não farás para ti imagem de escultura, nem figura alguma de tudo que há em cima no Céu, e do que há embaixo na terra, nem de coisa alguma que haja nas águas, debaixo da terra. Não as adorarás, nem lhes darás culto; porque eu sou o Senhor teu Deus, o Deus zeloso, que vinga a iniquidade dos pais nos filhos até à terceira e quarta geração daqueles que me aborrecem; e que usa de misericórdia com milhares daqueles que me amam e que guardam os meus preceitos.”","Êx 20.4-6"],
+["Que exige o segundo mandamento?","O segundo mandamento exige que recebamos, observemos e guardemos puros e inteiros todo o culto e ordenanças religiosas que Deus instituiu na sua Palavra.","Dt 12.32; Mt 28.20; Jo 4.23-24"],
+["Que proíbe o segundo mandamento?","O segundo mandamento proíbe o adorar a Deus por meio de imagens, ou de qualquer outra maneira não prescrita na sua Palavra.","Rm 1.22-23; 2Rs 18.3-4"],
+["Quais são as razões anexas ao segundo mandamento?","As razões anexas ao segundo mandamento são a soberania de Deus sobre nós, a sua propriedade em nós e o zelo que Ele tem pelo seu culto.","Sl 45.11; 100.3; Êx 34.14; 1Co 10.22"],
+["Qual é o terceiro mandamento?","O terceiro mandamento é: “Não tomarás o nome do Senhor teu Deus em vão, porque o Senhor não terá por inocente aquele que tomar em vão o nome do Senhor seu Deus.”","Êx 20.7"],
+["Que exige o terceiro mandamento?","O terceiro mandamento exige o santo e reverente uso dos nomes, títulos, atributos, ordenanças, palavras e obras de Deus.","Sl 29.2; Ap 15.3-4; Ec 5.1; Sl 138.2; 104.24"],
+["Que proíbe o terceiro mandamento?","O terceiro mandamento proíbe toda a profanação ou abuso das coisas por meio das quais Deus se faz conhecer.","Lv 19.12; Mt 5.34-35"],
+["Qual é a razão anexa ao terceiro mandamento?","A razão anexa ao terceiro mandamento é que, embora os transgressores deste mandamento escapem do castigo dos homens, o Senhor nosso Deus não os deixará escapar do seu justo juízo.","Dt 28.58-59"],
+["Qual é o quarto mandamento?","O quarto mandamento é: “Lembra-te de santificar o dia do Sábado. Trabalharás seis dias, e farás neles tudo o que tens para fazer. O sétimo dia, porém, é o Sábado do Senhor teu Deus. Não farás nesse dia obra alguma, nem tu, nem teu filho, nem tua filha, nem o teu servo, nem a tua serva, nem o teu animal, nem o peregrino que vive das tuas portas para dentro. Porque o Senhor fez em seis dias o céu, a terra e o mar, e tudo o que neles há, e descansou no sétimo dia. Por isso o Senhor abençoou o dia sétimo e o santificou.”","Êx 20.8-11"],
+["Que exige o quarto mandamento?","O quarto mandamento exige que consagremos a Deus os tempos determinados em sua Palavra, particularmente um dia inteiro em cada sete, para ser um dia de santo descanso a Ele dedicado.","Lv 19.30; Dt 5.12"],
+["Qual dos sete dias designou Deus para esse descanso semanal?","Desde o princípio do mundo até à ressurreição de Cristo, Deus designou o sétimo dia da semana para o descanso semanal; e desde então o primeiro dia da semana, para continuar sempre até ao fim do mundo, que é o Sábado cristão, ou Domingo.","Gn 2.3; Êx 16.23; At 20.7; 1Co 16.1-2; Ap 1.10"],
+["De que modo se deve santificar o Domingo?","Deve-se santificar o Domingo com um santo repouso por todo aquele dia, mesmo das ocupações e recreações temporais que são permitidas nos outros dias, empregando todo o tempo em exercícios públicos e particulares de adoração a Deus, exceto o tempo preciso para as obras de pura necessidade e misericórdia.","Lv 23.3; Is 58.13-14; Mt 12.11-12; Mc 2.27-28"],
+["Que proíbe o quarto mandamento?","O quarto mandamento proíbe a omissão ou a negligência no cumprimento dos deveres exigidos, e a profanação deste dia por meio de ociosidade, ou por fazer aquilo que é em si mesmo pecaminoso, ou por desnecessários pensamentos, palavras ou obras acerca de nossos negócios e recreações temporais.","Jr 17.21; Lc 23.56"],
+["Quais são as razões anexas ao quarto mandamento?","As razões anexas ao quarto mandamento são: a permissão que Deus nos concede de fazermos uso dos seis dias da semana para os nossos interesses temporais, o reclamar Ele para si a propriedade especial do dia sétimo, o seu próprio exemplo e a bênção que Ele conferiu ao dia do descanso.","Êx 31.15-16; Lv 23.3; Êx 31.17; Gn 2.3"],
+["Qual é o quinto mandamento?","O quinto mandamento é: “Honrarás a teu pai e a tua mãe, para teres uma dilatada vida sobre a terra que o Senhor teu Deus te há de dar.”","Êx 20.12"],
+["Que exige o quinto mandamento?","O quinto mandamento exige a conservação da honra e o desempenho dos deveres pertencentes a cada um em suas diferentes condições e relações, como superiores, inferiores ou iguais.","Ef 6.1-3; Rm 13.1-2; 12.10"],
+["Que proíbe o quinto mandamento?","O quinto mandamento proíbe negligenciarmos ou fazermos alguma coisa contra a honra e dever que pertencem a cada um em suas diferentes condições e relações.","Rm 13.7-8"],
+["Qual é a razão anexa ao quinto mandamento?","A razão anexa ao quinto mandamento é uma promessa de longa vida e prosperidade (quanto sirva para glória de Deus e bem do homem) a todos aqueles que guardam este mandamento.","Ef 6.2-3"],
+["Qual é o sexto mandamento?","O sexto mandamento é: “Não matarás.”","Êx 20.13"],
+["Que exige o sexto mandamento?","O sexto mandamento exige todos os esforços lícitos para conservar a nossa vida e a dos nossos semelhantes.","Sl 132.3-4; At 27.33-34; Rm 12.20-21; Lc 10.33-37"],
+["Que proíbe o sexto mandamento?","O sexto mandamento proíbe o tirar a nossa própria vida, ou a do nosso próximo injustamente, e tudo aquilo que para isso concorre.","At 16.28; Gn 9.6; Dt 24.6; Pv 24.11-12; 1Jo 3.15"],
+["Qual é o sétimo mandamento?","O sétimo mandamento é: “Não adulterarás.”","Êx 20.14"],
+["Que exige o sétimo mandamento?","O sétimo mandamento exige a conservação da nossa própria castidade e da do nosso próximo, no coração, nas palavras e nos costumes.","1Ts 4.4; Ef 4.29; 5.11-12; 1Pe 3.2"],
+["Que proíbe o sétimo mandamento?","O sétimo mandamento proíbe todos os pensamentos, palavras e ações impuras.","Mt 5.28; Ef 5.3-4"],
+["Qual é o oitavo mandamento?","O oitavo mandamento é: “Não furtarás.”","Êx 20.15"],
+["Que exige o oitavo mandamento?","O oitavo mandamento exige que procuremos o lícito adiantamento das riquezas e do estado exterior, tanto nosso como do nosso próximo.","Pv 27.23; 22.1-14; Fp 2.4; Êx 23.4-6"],
+["Que proíbe o oitavo mandamento?","O oitavo mandamento proíbe tudo o que impede ou pode impedir injustamente o adiantamento da riqueza ou do bem-estar, tanto nosso como do nosso próximo.","Pv 28.19; 1Tm 5.8; Tg 5.1-4"],
+["Qual é o nono mandamento?","O nono mandamento é: “Não dirás falso testemunho contra o teu próximo.”","Êx 20.16"],
+["Que exige o nono mandamento?","O nono mandamento exige a conservação e promoção da verdade entre os homens, e a manutenção da nossa boa reputação e da do nosso próximo, especialmente quando somos chamados a dar testemunho.","Ef 4.25; 1Pe 3.16; At 25.10; 3Jo 12; Pv 14.5, 25; Mt 5.37"],
+["Que proíbe o nono mandamento?","O nono mandamento proíbe tudo o que é prejudicial à verdade, ou injurioso, tanto à nossa reputação como à do nosso próximo.","Cl 3.9; 2Co 8.20-21; Sl 15.3; 12.3"],
+["Qual é o décimo mandamento?","O décimo mandamento é: “Não cobiçarás a casa do teu próximo; não desejarás a sua mulher, nem o seu servo, nem a sua serva, nem o seu boi, nem o seu jumento, nem coisa alguma que lhe pertença.”","Êx 20.17"],
+["Que exige o décimo mandamento?","O décimo mandamento exige o pleno contentamento com a nossa condição, bem como disposição caridosa para com o nosso próximo e tudo o que lhe pertence.","Hb 13.5; 1Tm 6.6-10; Lv 19.18; 1Co 13.4-6"],
+["Que proíbe o décimo mandamento?","O décimo mandamento proíbe todo o descontentamento com a nossa condição, todo o movimento de inveja ou pesar à vista da prosperidade do nosso próximo e todas as tendências ou afeições desordenadas a alguma coisa que lhe pertence.","1Co 10.10; Gl 5.26; Cl 3.5; 1Tm 6.6-10"],
+["Será alguém capaz de guardar perfeitamente os mandamentos de Deus?","Nenhum mero homem, desde a queda de Adão, é capaz, nesta vida, de guardar perfeitamente os mandamentos de Deus, mas diariamente os quebranta por pensamentos, palavras e obras.","Rm 3.9-10; Tg 3.2"],
+["São igualmente odiosas todas as transgressões da lei?","Alguns pecados, em si mesmos e em razão de circunstâncias agravantes, são mais odiosos à vista de Deus do que outros.","Sl 19.13; Mt 11.24; Lc 12.10; Hb 2.2-3"],
+["Que merece cada pecado?","Cada pecado merece a ira e a maldição de Deus, tanto nesta vida como na vindoura.","Gl 3.10; Tg 2.10; Mt 25.41"],
+["Que exige Deus de nós para que possamos escapar à sua ira e maldição em que temos incorrido pelo pecado?","Para escaparmos à ira e maldição de Deus, em que temos incorrido pelo pecado, Deus exige de nós fé em Jesus Cristo e arrependimento para a vida, com o uso diligente de todos os meios exteriores pelos quais Cristo nos comunica as bênçãos da redenção.","At 20.21; 2Pe 1.10; Hb 2.3; 1Tm 4.16"],
+["Que é fé em Jesus Cristo?","Fé em Jesus Cristo é uma graça salvadora, pela qual o recebemos e confiamos só nele para a salvação, como Ele nos é oferecido.","At 16.31; Hb 10.39; Jo 1.12; Fp 3.9; Ap 22.17"],
+["Que é arrependimento para a vida?","Arrependimento para a vida é uma graça salvadora pela qual o pecador, tendo um verdadeiro sentimento do seu pecado e percepção da misericórdia de Deus em Cristo, se enche de tristeza e de horror pelos seus pecados, abandona-os e volta para Deus, inteiramente resolvido a prestar-lhe nova obediência.","2Co 7.10; At 2.37; Lc 1.77-79; Jr 31.18-19; Rm 6.18"],
+["Quais são os meios exteriores e ordinários pelos quais Cristo nos comunica as bênçãos da redenção?","Os meios exteriores e ordinários pelos quais Cristo nos comunica as bênçãos da redenção são as suas ordenanças, especialmente a Palavra, os sacramentos e a oração, as quais todas se tornam eficazes aos eleitos para a salvação.","At 2.41-42"],
+["Como se torna a Palavra eficaz para a salvação?","O Espírito de Deus torna a leitura, e especialmente a pregação da Palavra, meios eficazes para convencer e converter os pecadores, e para os edificar em santidade e conforto, por meio da fé, para a salvação.","Ne 8.8; At 20.32; Rm 15.4; 2Tm 3.15"],
+["Como se deve ler e ouvir a Palavra a fim de que ela se torne eficaz para a salvação?","Para que a Palavra se torne eficaz para a salvação, devemos ouvi-la com diligência, preparação e oração; recebê-la com fé e amor, guardá-la em nossos corações e praticá-la em nossas vidas.","Dt 6.6-7; 1Pe 2.1-2; Sl 119.11-18; Rm 1.16; 2Ts 2.10; Tg 1.21-25"],
+["Como se tornam os sacramentos meios eficazes para a salvação?","Os sacramentos tornam-se meios eficazes para a salvação, não por alguma virtude que eles ou aqueles que os ministram tenham, mas somente pela bênção de Cristo e pela obra do seu Espírito naqueles que pela fé os recebem.","1Pe 3.21; Rm 2.28-29; 1Co 12.13; 10.16-17"],
+["Que é um sacramento?","Um sacramento é uma santa ordenança, instituída por Cristo, na qual, por sinais sensíveis, Cristo e as bênçãos do novo pacto são representadas, seladas e aplicadas aos crentes.","Mt 26.26-28; 28.19; Rm 4.11"],
+["Quais são os sacramentos do Novo Testamento?","Os sacramentos do Novo Testamento são o Batismo e a Ceia do Senhor.","At 10.47-48; 1Co 11.23-26"],
+["Que é o Batismo?","O Batismo é o sacramento no qual o lavar com água em nome do Pai, do Filho e do Espírito Santo significa e sela a nossa união com Cristo, a participação das bênçãos do pacto da graça e a promessa de pertencermos ao Senhor.","Mt 28.19; Jo 3.5; Rm 6.1-11; Gl 3.27"],
+["A quem deve ser ministrado o Batismo?","O Batismo não deve ser ministrado àqueles que estão fora da igreja visível, enquanto não professarem sua fé em Cristo e obediência a Ele; mas os filhos daqueles que são membros da igreja visível devem ser batizados.","At 18.8; Gn 17.7-14; At 2.38-39; 1Co 7.14"],
+["Que é a Ceia do Senhor?","A Ceia do Senhor é o sacramento no qual, dando-se e recebendo-se pão e vinho, conforme a instituição de Cristo, se anuncia a sua morte, e aqueles que participam dignamente tornam-se, não de uma maneira corporal e carnal, mas pela fé, participantes do seu corpo e do seu sangue, com todas as suas bênçãos, para o seu alimento espiritual e crescimento em graça.","1Co 11.23-26; At 3.21; 1Co 10.16"],
+["Que se exige para participar dignamente da Ceia do Senhor?","Exige-se daqueles que desejam participar dignamente da Ceia do Senhor que se examinem sobre o seu conhecimento em discernir o corpo do Senhor, sobre a sua fé para se alimentarem dele, sobre o seu arrependimento, amor e nova obediência; para não suceder que, vindo indignamente, comam e bebam para si a condenação.","1Co 11.27, 31-32; Rm 6.17-18"],
+["Que é oração?","A oração é um santo oferecimento dos nossos desejos a Deus, por coisas conformes com a sua vontade, em nome de Cristo, com a confissão dos nossos pecados e um agradecido reconhecimento das suas misericórdias.","Sl 10.17; 145.19; 1Jo 5.14; 1.9; Jo 16.23-24; Fp 4.6"],
+["Qual é a regra que Deus nos deu para nos dirigir em oração?","Toda a Palavra de Deus é útil para nos dirigir em oração, mas a regra especial de direção é aquela forma de oração que Cristo ensinou aos seus discípulos, e que geralmente se chama a Oração Dominical.","Rm 8.26; Sl 119.170; Mt 6.9-13"],
+["Que nos ensina o prefácio da Oração Dominical?","O prefácio da Oração Dominical, que é: “Pai nosso que estás no Céu”, ensina-nos que nos devemos aproximar de Deus com toda a santa reverência e confiança, como filhos a um pai poderoso e pronto para nos ajudar, e também nos ensina a orar com os outros e por eles.","Lc 11.13; Rm 8.15; 1Tm 2.1-2"],
+["Pelo que oramos na primeira petição?","Na primeira petição, que é: “Santificado seja o teu nome”, pedimos que Deus nos habilite, a nós e aos outros, a glorificá-lo em tudo aquilo em que se dá a conhecer, e que disponha tudo para sua glória.","Sl 67.1-3; Rm 11.36; Ap 4.11"],
+["Pelo que oramos na segunda petição?","Na segunda petição, que é: “Venha o teu reino”, pedimos que o reino de Satanás seja destruído e que o reino da graça seja adiantado; que nós e os outros a ele sejamos guiados e nele guardados, e que cedo venha o reino da glória.","Sl 68.1; Jo 12.31; Mt 9.37-38; 2Ts 3.1; Rm 10.1; Ap 22.20"],
+["Pelo que oramos na terceira petição?","Na terceira petição, que é: “Seja feita a tua vontade, assim na terra como no Céu”, pedimos que Deus, pela sua graça, nos torne capazes e desejosos de conhecer a sua vontade, de obedecer e submeter-nos a ela em tudo, como fazem os anjos no Céu.","Mt 26.39; Fp 1.9-11; Sl 103.20-21"],
+["Pelo que oramos na quarta petição?","Na quarta petição, que é: “O pão nosso de cada dia nos dá hoje”, pedimos que, da livre dádiva de Deus, recebamos uma porção suficiente das coisas boas desta vida e gozemos com elas de suas bênçãos.","Pv 30.8-9; 1Tm 6.6-8; Pv 10.22"],
+["Pelo que oramos na quinta petição?","Na quinta petição, que é: “E perdoa-nos as nossas dívidas, assim como nós também perdoamos aos nossos devedores”, pedimos que Deus, por amor de Cristo, nos perdoe gratuitamente os nossos pecados, o que somos animados a pedir porque, pela sua graça, somos habilitados a perdoar de coração ao nosso próximo.","Sl 51.1-2, 7; Mt 18.35"],
+["Pelo que oramos na sexta petição?","Na sexta petição, que é: “E não nos deixes cair em tentação”, pedimos que Deus nos guarde de sermos tentados a pecar, ou nos preserve e livre quando formos tentados.","Mt 26.41; Sl 19.13; Jo 17.15; 1Co 10.13"],
+["Que nos ensina a conclusão da Oração Dominical?","A conclusão da Oração Dominical, que é: “Porque teu é o reino, o poder e a glória, para sempre. Amém”, ensina-nos que na oração devemos confiar somente em Deus e louvá-lo em nossas orações, atribuindo-lhe reino, poder e glória. E, em testemunho do nosso desejo e certeza de sermos ouvidos, dizemos: Amém.","Dn 9.18-19; Fp 4.6; 1Cr 29.11-13; 1Co 14.16; Ap 22.20-21"]
+];
+
+/* Lições — seguem a estrutura do próprio Catecismo */
+const U=[
+ {t:"Deus e as Escrituras",a:1,b:6},
+ {t:"Decretos, criação e providência",a:7,b:12},
+ {t:"A queda e o pecado",a:13,b:19},
+ {t:"O Redentor",a:20,b:28},
+ {t:"A redenção aplicada",a:29,b:38},
+ {t:"O dever do homem e a Lei",a:39,b:44},
+ {t:"1º e 2º mandamentos",a:45,b:52},
+ {t:"3º e 4º mandamentos",a:53,b:62},
+ {t:"5º a 7º mandamentos",a:63,b:72},
+ {t:"8º a 10º mandamentos",a:73,b:81},
+ {t:"Pecado, fé e arrependimento",a:82,b:87},
+ {t:"A Palavra e os sacramentos",a:88,b:97},
+ {t:"A oração e o Pai Nosso",a:98,b:107}
+];
+
+const TEXTS={
+ mand:{t:"Os Dez Mandamentos",ref:"Êx 20.3-17",list:["Não terás outros deuses além de mim.","Não farás para ti imagem de escultura, nem figura alguma de tudo que há em cima no céu, e do que há embaixo na terra, nem de coisa que haja nas águas debaixo da terra. Não as adorarás, nem lhes darás culto, porque Eu sou o Senhor teu Deus, o Deus zeloso, que vinga a iniquidade dos pais nos filhos até a terceira e quarta geração daqueles que me aborrecem, e que usa de misericórdia com milhares daqueles que me amam e que guardam os meus preceitos.","Não tomarás em vão o nome do Senhor teu Deus, porque o Senhor não terá por inocente aquele que tomar em vão o nome do Senhor seu Deus.","Lembra-te de santificar o dia de Sábado. Trabalharás seis dias e farás neles tudo o que tens para fazer. O sétimo dia, porém, é o sábado do Senhor teu Deus. Não farás nesse dia obra alguma, nem tu, nem teu filho, nem tua filha, nem o teu animal, nem o peregrino que vive das tuas portas para dentro. Porque o Senhor fez em seis dias o céu e a terra, e tudo o que neles há, e descansou no sétimo e o santificou.","Honrarás a teu pai e a tua mãe, para teres uma vida dilatada sobre a terra que o Senhor teu Deus te há de dar.","Não matarás.","Não adulterarás.","Não furtarás.","Não dirás falso testemunho contra o teu próximo.","Não cobiçarás a casa de teu próximo; não desejarás a sua mulher, nem o seu servo, nem a sua serva, nem o seu boi, nem o seu jumento, nem coisa alguma que lhe pertença."],
+   after:"Resumo (Lc 10.27): Amarás ao Senhor teu Deus de todo o teu coração, de toda a tua alma, de todas as tuas forças e de todo o teu entendimento; e ao teu próximo como a ti mesmo."},
+ pai:{t:"Oração Dominical",ref:"Mt 6.9-13",body:"Pai nosso que estás nos Céus, santificado seja o teu nome; venha o teu reino; seja feita a tua vontade, assim na terra como no Céu. O pão nosso de cada dia nos dá hoje; e perdoa-nos as nossas dívidas, assim como nós perdoamos aos nossos devedores; e não nos deixes cair em tentação, mas livra-nos do mal; porque teu é o reino, o poder e a glória para sempre. Amém."},
+ credo:{t:"Credo Apostólico",ref:"",body:"Creio em Deus Pai, todo-poderoso, Criador do céu e da terra. Creio em Jesus Cristo, seu único Filho, nosso Senhor, o qual foi concebido por obra do Espírito Santo; nasceu da Virgem Maria; padeceu sob o poder de Pôncio Pilatos, foi crucificado, morto e sepultado; desceu ao Hades; ressurgiu dos mortos ao terceiro dia; subiu ao Céu; está sentado à mão direita de Deus Pai todo-poderoso; donde há de vir a julgar os vivos e os mortos. Creio no Espírito Santo; na santa Igreja universal; na comunhão dos santos; na remissão dos pecados; na ressurreição do corpo; na vida eterna. Amém."}
+};
+
+/* ===== utilidades ===== */
+const app=document.getElementById('app');
+const KEY='lumi-catecismo-v1';
+let P={m:{},seen:{},last:null};
+try{const r=localStorage.getItem(KEY);if(r)P=Object.assign(P,JSON.parse(r));}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(P))}catch(e){}}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const range=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i);
+const nums=u=>u<0?range(1,107):range(U[u].a,U[u].b);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const norm=w=>w.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9-]/g,'');
+const bare=w=>w.replace(/^[“”"(]+|[“”")\.,;:!?]+$/g,'');
+const stars=n=>P.m[n]||0;
+const unitOf=n=>U.findIndex(u=>n>=u.a&&n<=u.b);
+const pct=list=>Math.round(list.reduce((s,n)=>s+stars(n),0)/(list.length*3)*100);
+const STOP=new Set("que para como pela pelo pelas pelos nossa nosso nossos nossas todas todos toda todo mesmo sobre entre aquele aqueles aquela aquelas tambem quando porque dele dela delas deles desta deste destas destes mais isto isso seus suas sua seu cada esta este estas estes nesta neste muito sendo assim pois qual quais nele nela nelas neles numa outro outros outra outras ainda aos das dos".split(' '));
+
+function flameSVG(on){return `<svg viewBox="0 0 12 16" aria-hidden="true"><path class="${on?'on':'off'}" d="M6 15C2.5 15 1 12.5 1.6 9.8 2.2 7.2 4.6 6 5 1c2.6 2.3 5.4 5.4 5.4 9 0 3-1.8 5-4.4 5z"/></svg>`}
+function flamesRow(n){const s=stars(n);return `<span class="flames" aria-label="${s} de 3">${[0,1,2].map(i=>flameSVG(i<s)).join('')}</span>`}
+
+function bushSVG(){
+  const fl=(x,h,w,l,base)=>`M${x} ${base} C${x-w} ${base-h*.35} ${x-w*.55+l} ${base-h*.78} ${x+l} ${base-h} C${x+w*.55+l} ${base-h*.72} ${x+w} ${base-h*.35} ${x} ${base}Z`;
+  const outer=[[20,30,10,-4],[34,46,11,-3],[48,58,12,-1],[61,66,12,0],[74,58,12,1],[88,46,11,3],[102,30,10,4]];
+  const inner=[[34,24,5,-2],[48,32,6,-1],[61,38,6,0],[74,32,6,1],[88,24,5,2]];
+  return `<svg class="bush" viewBox="0 0 122 92" aria-hidden="true">${outer.map(f=>`<path class="f1" d="${fl(f[0],f[1],f[2],f[3],78)}"/>`).join('')}${inner.map(f=>`<path class="f2" d="${fl(f[0],f[1],f[2],f[3],78)}"/>`).join('')}<rect class="bar" x="16" y="84" width="90" height="4" rx="2"/></svg>`;
+}
+function lumiSVG(mood){
+  const mouth=mood==='sad'?'M66 41q3.5-2.4 7 0':'M66 39q3.5 3.2 7 0';
+  return `<svg class="lumi" viewBox="0 0 92 74" aria-hidden="true" style="color:var(--fg)">
+  <path d="M30 55v12M42 57v12M56 57v12" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/>
+  <path fill="var(--wool)" stroke="currentColor" stroke-width="2.2" d="M20 42c-8 0-11-8-7-13 0-8 9-11 14-8 3-7 13-8 17-3 6-4 15-1 16 5 7 0 11 7 8 12 4 6 0 13-7 13-1 6-9 9-14 5-4 5-13 5-16 0-7 3-13-1-11-11z"/>
+  <ellipse cx="61" cy="25" rx="7" ry="3.4" transform="rotate(-28 61 25)" fill="var(--face)"/>
+  <ellipse cx="70" cy="34" rx="10.5" ry="12.5" fill="var(--face)"/>
+  <ellipse cx="80" cy="27" rx="6" ry="3" transform="rotate(25 80 27)" fill="var(--face)"/>
+  <circle cx="66" cy="32" r="1.9" fill="#fff"/><circle cx="74" cy="32" r="1.9" fill="#fff"/>
+  <path d="${mouth}" stroke="#fff" fill="none" stroke-width="1.7" stroke-linecap="round"/>
+  <path d="M60 14c2-4 1-7 0-9 3 2 6 5 5 9-1 2-3 2-5 0z" fill="var(--gold)"/>
+  </svg>`;
+}
+
+function speak(text){
+  try{const s=window.speechSynthesis;s.cancel();const u=new SpeechSynthesisUtterance(text.replace(/[“”]/g,''));u.lang='pt-BR';u.rate=.95;
+  const v=s.getVoices().find(v=>/^pt/i.test(v.lang));if(v)u.voice=v;s.speak(u);}catch(e){}
+}
+
+/* ===== estado e navegação ===== */
+const S={v:'home'};
+function go(v,extra){Object.assign(S,{v},extra||{});try{speechSynthesis.cancel()}catch(e){};render();window.scrollTo(0,0)}
+
+function topbar(title,back,right){
+  return `<div class="topbar"><div class="wrap"><button class="back" data-act="${back}" aria-label="Voltar">‹ Voltar</button><span class="tt">${esc(title)}</span>${right?`<span class="count">${right}</span>`:''}</div></div>`;
+}
+
+/* ===== telas ===== */
+function vHome(){
+  const all=range(1,107), p=pct(all);
+  const learned=all.filter(n=>stars(n)>0).length;
+  const last=P.last!=null&&U[P.last]?P.last:null;
+  return `
+  <div class="band"><div class="wrap">${bushSVG()}
+    <div style="flex:1;min-width:0"><p class="eyebrow">Lumi · Catecismo</p>
+    <h1>Breve Catecismo de Westminster</h1>
+    <p>107 perguntas e respostas para aprender juntos, em casa e na igreja.</p>
+    <div class="overall" title="${p}% concluído"><i style="width:${p}%"></i></div></div>
+  </div></div>
+  <main class="wrap">
+    ${last!=null?`<button class="continue" data-act="unit" data-u="${last}">${lumiSVG()}<span><span class="eyebrow">Continuar</span><b>Lição ${last+1} · ${esc(U[last].t)}</b><span class="ls">Perguntas ${U[last].a}–${U[last].b} · ${pct(nums(last))}% dominado</span></span></button>`:
+    `<button class="continue" data-act="unit" data-u="0">${lumiSVG()}<span><span class="eyebrow">Comece por aqui</span><b>“Qual é o fim principal do homem?”</b><span class="ls">Lição 1 · Deus e as Escrituras</span></span></button>`}
+    <section>
+      <div class="sec-h"><h2>Lições</h2><span class="ls">${learned} de 107 já praticadas</span></div>
+      <ul class="lessons">${U.map((u,i)=>{const pp=pct(nums(i));return `<li><button class="lesson" data-act="unit" data-u="${i}">
+        <span class="num">${i+1}</span>
+        <span style="min-width:0"><span class="lt">${esc(u.t)}</span><span class="ls">Perguntas ${u.a}–${u.b}</span><span class="mini"><i style="width:${pp}%"></i></span></span>
+        <span class="chev">›</span></button></li>`}).join('')}</ul>
+    </section>
+    <section>
+      <div class="sec-h"><h2>Na igreja</h2></div>
+      <div class="tools">
+        <button class="tool primary" data-act="class"><b>Modo Classe</b><span>Projetar perguntas em tela grande e revelar a resposta.</span></button>
+        <button class="tool" data-act="review"><b>Revisão geral</b><span>8 perguntas sorteadas de todo o Catecismo.</span></button>
+      </div>
+    </section>
+    <section>
+      <div class="sec-h"><h2>Textos para decorar</h2></div>
+      <div class="tools">
+        <button class="tool" data-act="text" data-t="mand"><b>Dez Mandamentos</b><span>Êx 20.3-17</span></button>
+        <button class="tool" data-act="text" data-t="pai"><b>Pai Nosso</b><span>Mt 6.9-13</span></button>
+        <button class="tool" data-act="text" data-t="credo"><b>Credo</b><span>Credo Apostólico</span></button>
+      </div>
+    </section>
+    <p class="foot">O progresso fica salvo neste aparelho.</p>
+  </main>`;
+}
+
+function vUnit(){
+  const u=U[S.u], list=nums(S.u);
+  return topbar(`Lição ${S.u+1}`,'home',pct(list)+'%')+`
+  <main class="wrap">
+    <div><p class="eyebrow">Lição ${S.u+1} · Perguntas ${u.a}–${u.b}</p><h1 style="font-size:1.8rem;margin-top:4px">${esc(u.t)}</h1></div>
+    <div class="tools">
+      <button class="tool primary" data-act="study" data-i="0"><b>Estudar</b><span>Ler, ouvir e revelar cada resposta.</span></button>
+      <button class="tool" data-act="play" data-mode="quiz"><b>Quiz</b><span>Escolha a resposta certa.</span></button>
+      <button class="tool" data-act="play" data-mode="complete"><b>Completar</b><span>Encaixe as palavras que faltam.</span></button>
+      <button class="tool" data-act="play" data-mode="build"><b>Montar</b><span>Coloque os trechos na ordem.</span></button>
+      <button class="tool" data-act="play" data-mode="mix"><b>Desafio</b><span>Tudo misturado, para fixar.</span></button>
+    </div>
+    <section>
+      <div class="sec-h"><h2>Perguntas</h2><span class="ls">3 chamas = dominada</span></div>
+      <ul class="qlist">${list.map((n,i)=>`<li><button class="qrow" data-act="study" data-i="${i}"><span class="n">${n}</span><span>${esc(Q[n-1][0])}</span>${flamesRow(n)}</button></li>`).join('')}</ul>
+    </section>
+  </main>`;
+}
+
+function vStudy(){
+  const list=nums(S.u), n=list[S.i], [q,a,r]=Q[n-1];
+  return topbar(U[S.u].t,'backunit',`${S.i+1}/${list.length}`)+`
+  <main class="wrap">
+    <article class="card">
+      <div class="qnum">Pergunta ${n}</div>
+      <div class="qtext">${esc(q)}</div>
+      <div class="atext ${S.rev?'':'hidden'}" ${S.rev?'':'aria-hidden="true"'}>${esc(a)}</div>
+      <div class="row">
+        ${S.rev?'':`<button class="btn solid" data-act="reveal">Mostrar resposta</button>`}
+        <button class="btn" data-act="speak">▶ Ouvir</button>
+      </div>
+      <div class="refs"><b>Referências:</b> ${esc(r)}</div>
+    </article>
+    <div class="nav">
+      <button class="btn" data-act="sprev" ${S.i===0?'disabled':''}>‹ Anterior</button>
+      ${S.i<list.length-1?`<button class="btn solid" data-act="snext">Próxima ›</button>`:`<button class="btn gold" data-act="play" data-mode="mix">Fazer o desafio</button>`}
+    </div>
+  </main>`;
+}
+
+/* --- jogos --- */
+function chunksOf(a){
+  let parts=a.split(/(?<=[,;:])\s+/).filter(Boolean);
+  let out=[];
+  parts.forEach(p=>{const w=p.split(/\s+/);
+    if(w.length>8){const k=Math.ceil(w.length/6);const sz=Math.ceil(w.length/k);for(let i=0;i<w.length;i+=sz)out.push(w.slice(i,i+sz).join(' '));}
+    else out.push(p);});
+  // junta pedaços muito curtos
+  out=out.reduce((acc,c)=>{if(acc.length&&c.split(' ').length<2)acc[acc.length-1]+=' '+c;else acc.push(c);return acc},[]);
+  while(out.length>7){let best=0,bl=1e9;for(let i=0;i<out.length-1;i++){const l=out[i].length+out[i+1].length;if(l<bl){bl=l;best=i}}out.splice(best,2,out[best]+' '+out[best+1]);}
+  if(out.length<3){const w=a.split(/\s+/);const sz=Math.ceil(w.length/3);out=[];for(let i=0;i<w.length;i+=sz)out.push(w.slice(i,i+sz).join(' '));}
+  return out;
+}
+function candidates(n){
+  const [q,a]=Q[n-1];const qs=new Set(q.split(/\s+/).map(norm));
+  const words=a.split(/\s+/);
+  return {words,c:words.map((w,i)=>({i,k:norm(w)})).filter(o=>o.k.length>=4&&!STOP.has(o.k)&&!qs.has(o.k))};
+}
+function setupItem(){
+  const g=S.g,it=g.items[g.i],n=it.n,[q,a]=Q[n-1];
+  g.done=false;g.miss=0;g.correct=null;
+  if(it.mode==='complete'){
+    const {words,c}=candidates(n);
+    const k=Math.min(c.length, words.length<15?2:words.length<35?3:4);
+    if(k<1){it.mode='quiz';return setupItem();}
+    const seenK=new Set();const chosen=[];
+    for(const o of shuffle(c)){if(chosen.length>=k)break;if(!seenK.has(o.k)){seenK.add(o.k);chosen.push(o)}}
+    chosen.sort((x,y)=>x.i-y.i);
+    const others=shuffle(range(1,107).filter(m=>m!==n)).slice(0,6).flatMap(m=>candidates(m).c.map(o=>bare(candidates(m).words[o.i])));
+    const distract=[];for(const w of shuffle(others)){if(distract.length>=2)break;if(!seenK.has(norm(w))&&!distract.some(d=>norm(d)===norm(w)))distract.push(w)}
+    g.st={words,blanks:chosen.map(o=>o.i),filled:0,bank:shuffle([...chosen.map(o=>bare(words[o.i])),...distract]).map(w=>({w,used:false}))};
+  } else if(it.mode==='build'){
+    const ch=chunksOf(a);
+    g.st={chunks:ch,order:shuffle(ch.map((_,i)=>i)),placed:[],used:new Set()};
+    if(g.st.order.every((v,i)=>v===i)&&ch.length>1)g.st.order.reverse();
+  } else {
+    const list=g.pool.filter(m=>m!==n);
+    const wrong=shuffle(list.length>=3?list:range(1,107).filter(m=>m!==n)).slice(0,3);
+    g.st={opts:shuffle([n,...wrong]),chosen:null};
+  }
+}
+function startGame(mode,pool,back){
+  const sel=shuffle(pool).slice(0,Math.min(8,pool.length));
+  const modes=['quiz','complete','build'];
+  S.g={pool,back,mode,i:0,ok:0,items:sel.map(n=>({n,mode:mode==='mix'?pick(modes):mode}))};
+  setupItem();go('game');
+}
+const MODE_NAME={quiz:'Quiz',complete:'Completar',build:'Montar',mix:'Desafio'};
+const PRAISE=['Muito bem!','Isso mesmo!','Correto!','Boa memória!','Excelente!'];
+function trunc(s,m){return s.length>m?s.slice(0,m).replace(/\s+\S*$/,'')+'…':s}
+
+function vGame(){
+  const g=S.g,it=g.items[g.i],n=it.n,[q,a,r]=Q[n-1];
+  const dots=g.items.map((_,i)=>`<i class="${i<g.i?'d':i===g.i?'c':''}"></i>`).join('');
+  let body='';
+  if(it.mode==='quiz'){
+    body=`<p class="prompt-label">Qual é a resposta?</p><div class="opts">${g.st.opts.map(m=>{
+      let cls='';if(g.done){if(m===n)cls='right';else if(m===g.st.chosen)cls='wrong'}
+      return `<button class="opt ${cls}" data-act="qopt" data-m="${m}" ${g.done?'disabled':''}>${esc(trunc(Q[m-1][1],170))}</button>`}).join('')}</div>`;
+  } else if(it.mode==='complete'){
+    const st=g.st;let bi=0;
+    const txt=st.words.map((w,i)=>{const b=st.blanks.indexOf(i);if(b<0)return esc(w);
+      const lead=(w.match(/^[“”"(]+/)||[''])[0],trail=(w.match(/[“”")\.,;:!?]+$/)||[''])[0];
+      const filled=b<st.filled;const cur=b===st.filled&&!g.done;
+      return `${esc(lead)}<span class="blank ${filled?'ok':''} ${cur?'cur':''}">${filled?esc(bare(w)):'·····'}</span>${esc(trail)}`}).join(' ');
+    body=`<p class="prompt-label">Complete a resposta tocando nas palavras na ordem</p><div class="card"><div class="fill">${txt}</div></div>
+      ${g.done?'':`<div class="bank">${st.bank.map((b,k)=>`<button class="chip ${b.used?'used':''}" data-act="cpick" data-k="${k}" ${b.used?'disabled':''}>${esc(b.w)}</button>`).join('')}</div>`}
+      ${g.miss?`<p class="miss">${g.miss} tentativa${g.miss>1?'s':''} errada${g.miss>1?'s':''}</p>`:''}`;
+  } else {
+    const st=g.st;
+    body=`<p class="prompt-label">Monte a resposta tocando nos trechos na ordem</p>
+      <div class="built">${st.placed.map(i=>`<span>${esc(st.chunks[i])} </span>`).join('')}</div>
+      ${g.done?'':`<div class="bank" style="flex-direction:column;align-items:stretch">${st.order.filter(i=>!st.used.has(i)).map(i=>`<button class="chip long" data-act="bpick" data-k="${i}">${esc(st.chunks[i])}</button>`).join('')}</div>`}
+      ${g.miss?`<p class="miss">${g.miss} tentativa${g.miss>1?'s':''} errada${g.miss>1?'s':''}</p>`:''}`;
+  }
+  const fb=g.done?`<div class="feedback ${g.correct?'':'bad'}"><div class="wrap">${lumiSVG(g.correct?'':'sad')}<div class="fb">
+    <h3>${g.correct?pick(PRAISE):'Vamos revisar'}</h3>
+    ${g.correct&&it.mode!=='quiz'?'':`<p><b>${n}.</b> ${esc(a)}</p>`}
+    <p class="ls">${esc(r)}</p>
+    <div class="row"><button class="btn solid" data-act="cont">${g.i<g.items.length-1?'Continuar':'Ver resultado'}</button><button class="btn" data-act="speakA">▶ Ouvir</button></div>
+  </div></div></div>`:'';
+  return topbar(MODE_NAME[g.mode],'quit',`${g.i+1}/${g.items.length}`)+`
+  <main class="wrap" style="padding-bottom:${g.done?'12px':'48px'}">
+    <div class="dots">${dots}</div>
+    <div><div class="qnum">Pergunta ${n} · ${MODE_NAME[it.mode]}</div><div class="qtext" style="margin-top:6px">${esc(q)}</div></div>
+    ${body}
+  </main>${fb}`;
+}
+function answered(ok){
+  const g=S.g,n=g.items[g.i].n;g.done=true;g.correct=ok;
+  if(ok){g.ok++;P.m[n]=Math.min(3,(P.m[n]||0)+1)}
+  P.seen[n]=1;save();render();
+  const f=document.querySelector('.feedback');if(f)f.scrollIntoView({block:'end',behavior:'smooth'});
+}
+
+function vResult(){
+  const g=S.g,t=g.items.length,r=g.ok/t;
+  const msg=r===1?'Perfeito! Você sabe estas respostas.':r>=.6?'Muito bom. Mais uma rodada e fica firme.':'Vale estudar as respostas e tentar de novo.';
+  return topbar('Resultado',g.back==='home'?'home':'backunit','')+`
+  <main class="wrap"><section class="card result">
+    ${lumiSVG(r<.5?'sad':'')}
+    <div class="big">${g.ok}/${t}</div>
+    <h2>${msg}</h2>
+    <ul class="qlist" style="width:100%;text-align:left">${g.items.map(it=>`<li><div class="qrow" style="cursor:default"><span class="n">${it.n}</span><span>${esc(Q[it.n-1][0])}</span>${flamesRow(it.n)}</div></li>`).join('')}</ul>
+    <div class="row" style="justify-content:center"><button class="btn solid" data-act="again">Jogar de novo</button>${g.back==='home'?`<button class="btn" data-act="home">Início</button>`:`<button class="btn" data-act="study" data-i="0">Estudar a lição</button>`}</div>
+  </section></main>`;
+}
+
+/* --- Modo Classe --- */
+function vClass(){
+  const list=nums(S.cu), n=list[S.ci], [q,a,r]=Q[n-1];
+  return topbar('Modo Classe','home',`${S.ci+1}/${list.length}`)+`
+  <div class="class">
+    <div class="stage">
+      <div class="qnum">Pergunta ${n}${S.cu>=0?' · Lição '+(S.cu+1):''}</div>
+      <div class="qtext">${esc(q)}</div>
+      <div class="atext ${S.crev?'':'hidden'}">${esc(a)}</div>
+      ${S.crev?`<div class="refs">${esc(r)}</div>`:''}
+    </div>
+    <div class="controls"><div class="wrap">
+      <select id="cu" aria-label="Lição"><option value="-1" ${S.cu<0?'selected':''}>Todas as perguntas</option>${U.map((u,i)=>`<option value="${i}" ${S.cu===i?'selected':''}>Lição ${i+1} · ${esc(u.t)}</option>`).join('')}</select>
+      <button class="btn" data-act="cprev" ${S.ci===0?'disabled':''}>‹</button>
+      <button class="btn solid" data-act="crev">${S.crev?'Esconder':'Revelar'}</button>
+      <button class="btn" data-act="cnext" ${S.ci>=list.length-1?'disabled':''}>›</button>
+      <button class="btn" data-act="crand">Sortear</button>
+      <button class="btn" data-act="cspeak">▶ Ouvir</button>
+      <button class="btn" data-act="full">Tela cheia</button>
+    </div><p class="hint">Teclado: espaço revela · setas mudam · S sorteia</p></div>
+  </div>`;
+}
+
+function vText(){
+  const t=TEXTS[S.t];
+  const body=t.list?`<ol>${t.list.map(x=>`<li>${esc(x)}</li>`).join('')}</ol><p>${esc(t.after)}</p>`:`<p>${esc(t.body)}</p>`;
+  return topbar(t.t,'home','')+`<main class="wrap"><article class="card">
+    <div><p class="eyebrow">${esc(t.ref)}</p><h1 style="font-size:1.7rem;margin-top:4px">${esc(t.t)}</h1></div>
+    <div class="text-body">${body}</div>
+    <div class="row"><button class="btn" data-act="speakT">▶ Ouvir</button></div></article></main>`;
+}
+
+function render(){
+  app.innerHTML=({home:vHome,unit:vUnit,study:vStudy,game:vGame,result:vResult,class:vClass,text:vText}[S.v]||vHome)();
+}
+
+/* ===== ações ===== */
+const ACT={
+  home:()=>go('home'),
+  unit:b=>{const u=+b.dataset.u;P.last=u;save();go('unit',{u})},
+  backunit:()=>go('unit'),
+  study:b=>go('study',{i:+(b.dataset.i||0),rev:false}),
+  reveal:()=>{S.rev=true;P.seen[nums(S.u)[S.i]]=1;save();render()},
+  sprev:()=>go('study',{i:Math.max(0,S.i-1),rev:false}),
+  snext:()=>go('study',{i:S.i+1,rev:false}),
+  speak:()=>{const[q,a]=Q[nums(S.u)[S.i]-1];speak(S.rev?q+'. '+a:q)},
+  play:b=>startGame(b.dataset.mode,nums(S.u),'unit'),
+  review:()=>startGame('mix',range(1,107),'home'),
+  quit:()=>go(S.g.back==='home'?'home':'unit'),
+  again:()=>startGame(S.g.mode,S.g.pool,S.g.back),
+  qopt:b=>{const m=+b.dataset.m,n=S.g.items[S.g.i].n;S.g.st.chosen=m;answered(m===n)},
+  cpick:b=>{const g=S.g,st=g.st,k=+b.dataset.k,item=st.bank[k];
+    const exp=norm(st.words[st.blanks[st.filled]]);
+    if(norm(item.w)===exp){item.used=true;st.filled++;if(st.filled>=st.blanks.length)return answered(g.miss===0);render();}
+    else{g.miss++;b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');const m=document.querySelector('.miss');if(m)m.textContent=`${g.miss} tentativa${g.miss>1?'s':''} errada${g.miss>1?'s':''}`;else render();}},
+  bpick:b=>{const g=S.g,st=g.st,k=+b.dataset.k;const exp=st.chunks[st.placed.length];
+    if(st.chunks[k]===exp){st.placed.push(k);st.used.add(k);if(st.placed.length===st.chunks.length)return answered(g.miss<=1);render();}
+    else{g.miss++;b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');const m=document.querySelector('.miss');if(m)m.textContent=`${g.miss} tentativa${g.miss>1?'s':''} errada${g.miss>1?'s':''}`;else render();}},
+  cont:()=>{const g=S.g;g.i++;if(g.i>=g.items.length)return go('result');setupItem();go('game')},
+  speakA:()=>{const n=S.g.items[S.g.i].n;speak(Q[n-1][0]+'. '+Q[n-1][1])},
+  class:()=>go('class',{cu:P.last!=null?P.last:0,ci:0,crev:false}),
+  crev:()=>{S.crev=!S.crev;render()},
+  cprev:()=>{if(S.ci>0){S.ci--;S.crev=false;render()}},
+  cnext:()=>{if(S.ci<nums(S.cu).length-1){S.ci++;S.crev=false;render()}},
+  crand:()=>{const l=nums(S.cu);let i=S.ci;if(l.length>1)while(i===S.ci)i=Math.floor(Math.random()*l.length);S.ci=i;S.crev=false;render()},
+  cspeak:()=>{const[q,a]=Q[nums(S.cu)[S.ci]-1];speak(S.crev?q+'. '+a:q)},
+  full:()=>{try{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}},
+  text:b=>go('text',{t:b.dataset.t}),
+  speakT:()=>{const t=TEXTS[S.t];speak(t.list?t.list.map((x,i)=>(i+1)+'. '+x).join(' '):t.body)}
+};
+app.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const f=ACT[b.dataset.act];if(f)f(b)});
+app.addEventListener('change',e=>{if(e.target.id==='cu'){S.cu=+e.target.value;S.ci=0;S.crev=false;render()}});
+document.addEventListener('keydown',e=>{
+  if(S.v==='class'){if(e.target.tagName==='SELECT')return;
+    if(e.key===' '||e.key==='Enter'){e.preventDefault();ACT.crev()}
+    else if(e.key==='ArrowRight')ACT.cnext();else if(e.key==='ArrowLeft')ACT.cprev();else if(e.key.toLowerCase()==='s')ACT.crand();}
+  else if(S.v==='study'){if(e.key==='ArrowRight'&&S.i<nums(S.u).length-1)ACT.snext();else if(e.key==='ArrowLeft'&&S.i>0)ACT.sprev();else if(e.key===' '&&!S.rev){e.preventDefault();ACT.reveal()}}
+});
+try{speechSynthesis.getVoices()}catch(e){}
+render();
+</script>
+</body>
+</html>
