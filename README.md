@@ -1,9 +1,16 @@
-# Lumi Catecismo
+# Lumi Catecismos
 
-Breve Catecismo de Westminster em jogos, para estudar em casa e ensinar na igreja.
-107 perguntas em 13 lições, com estudo narrado, quiz, completar, montar, desafio, Pergunta da Semana e Modo Classe com placar.
+Os padrões de Westminster em jogos, para estudar em casa e ensinar na igreja:
 
-Site estático, sem build: `index.html`, `data.js` (perguntas, lições e textos) e `app.js` (app).
-Publicado em https://lumi-catecismo.vercel.app
+- **Breve Catecismo** — 107 perguntas em 13 lições
+- **Catecismo Maior** — 196 perguntas em 27 lições
+- **Confissão de Fé** — 33 capítulos, 171 seções
 
-Para editar uma pergunta ou referência, altere `data.js`.
+Cada livro tem estudo narrado, quiz, completar, montar, desafio, pergunta/seção da semana e Modo Classe com placar.
+A Lumi, a ovelhinha, acompanha e reage a cada resposta.
+
+Site estático, sem build: `index.html`, `data.js` (Breve), `data-maior.js`, `data-conf.js` e `app.js`.
+Endereços diretos: `/#breve`, `/#maior`, `/#confissao`.
+
+Observação: o PDF do Catecismo Maior recebido não trazia as perguntas 176, 177 e 192; elas foram completadas
+pela tradução usual e devem ser conferidas na revisão.

@@ -8,11 +8,11 @@
 <link rel="icon" type="image/svg+xml" href="/icon.svg">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
-<meta name="apple-mobile-web-app-title" content="Catecismo">
+<meta name="apple-mobile-web-app-title" content="Catecismos">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="description" content="Breve Catecismo de Westminster em jogos: estudar, quiz, completar, montar e Modo Classe.">
-<title>Lumi Catecismo</title>
+<meta name="description" content="Breve Catecismo, Catecismo Maior e Confissão de Fé de Westminster em jogos: estudar, quiz, completar, montar e Modo Classe.">
+<title>Lumi Catecismos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Belleza&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap">
 <style>
@@ -260,6 +260,62 @@ select{font:inherit;color:var(--fg);background:var(--surface);border:1px solid v
 .team{display:flex;align-items:center;gap:8px;font-weight:500}
 .team b{font-family:var(--f-display);font-size:1.7rem;min-width:1.6em;text-align:center;font-variant-numeric:tabular-nums}
 .btn.sm{padding:6px 12px}
+/* Cores de cada livro: Breve = verde IPB, Maior = vinho, Confissão = azul-petróleo */
+:root[data-book="maior"]{--green:#7b2d35;--green-deep:#3f161b;--primary:#7b2d35;--green-soft:#f4e7e8}
+:root[data-book="conf"]{--green:#1f5068;--green-deep:#102c3a;--primary:#1f5068;--green-soft:#e3edf2}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"])[data-book="maior"]{--green:#e3949b;--green-deep:#2a0e12;--primary:#94404a;--green-soft:#33191c}
+  :root:not([data-theme="light"])[data-book="conf"]{--green:#86c0da;--green-deep:#0a1d27;--primary:#2c6a88;--green-soft:#15303d}}
+:root[data-theme="dark"][data-book="maior"]{--green:#e3949b;--green-deep:#2a0e12;--primary:#94404a;--green-soft:#33191c}
+:root[data-theme="dark"][data-book="conf"]{--green:#86c0da;--green-deep:#0a1d27;--primary:#2c6a88;--green-soft:#15303d}
+/* Recepção: a Lumi brincando com os livros */
+.band.hub .wrap.hero{gap:10px}
+.scene-wrap{display:flex;justify-content:center;margin:-4px 0 -6px}
+.scene{width:min(100%,420px);height:auto;overflow:visible}
+.scene .lumi{--ink:#1d2420}
+.scene .bk{cursor:pointer;transition:filter .2s}
+.scene .bk:hover,.scene .bk:focus-visible{filter:brightness(1.18);outline:none}
+.scene .bk-breve{transform-box:fill-box;transform-origin:0% 100%;animation:lean 5s ease-in-out infinite}
+.scene .bk-conf{transform-box:fill-box;transform-origin:50% 100%;animation:nudge 5s ease-in-out infinite}
+.scene .lumi-on-books>.lumi{transform-box:fill-box;transform-origin:50% 100%;animation:sway 5s ease-in-out infinite}
+.scene .lumi-on-books>.lumi.hop{animation:hop .5s ease-out}
+.scene .page{transform-box:fill-box;transform-origin:center;animation:flutter 3.2s ease-in-out infinite}
+.scene .notes path{transform-box:fill-box;transform-origin:center;animation:twinkle 1.8s ease-in-out infinite}
+.scene .notes path:nth-child(2){animation-delay:.9s}
+@keyframes lean{0%,100%{transform:rotate(0)}45%{transform:rotate(0)}55%{transform:rotate(-7deg)}65%{transform:rotate(0)}}
+@keyframes nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(0)}58%{transform:translateX(4px)}66%{transform:translateX(0)}}
+@keyframes sway{0%,40%,100%{transform:rotate(0) translateY(0)}48%{transform:rotate(-4deg) translateY(-6px)}56%{transform:rotate(3deg) translateY(0)}62%{transform:rotate(0)}}
+@keyframes flutter{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-6px) rotate(-6deg)}}
+.hub-bubble{margin-bottom:6px;border-radius:18px}
+.hub-bubble::after{left:50%;right:auto;top:-8px;bottom:auto;transform:translateX(-50%) rotate(45deg);width:14px;height:14px;clip-path:none;border-radius:2px}
+.back-hub{align-self:flex-start;background:color-mix(in srgb,var(--band-fg) 12%,transparent);color:var(--band-fg);border:0;border-radius:999px;padding:6px 12px;font-size:.88rem;font-weight:500}
+.shelf{display:flex;flex-direction:column;gap:12px}
+.bookcard{display:grid;grid-template-columns:12px 1fr auto;gap:14px;align-items:center;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:0 16px 0 0;overflow:hidden;min-height:118px}
+.bookcard:hover{border-color:var(--bc)}
+.bookcard .spine{align-self:stretch;background:var(--bc);position:relative}
+.bookcard .spine::after{content:"";position:absolute;inset:14px 4px;border-top:2px solid #e0ad4a;border-bottom:2px solid #e0ad4a}
+.bc-body{display:flex;flex-direction:column;gap:3px;padding-block:14px;min-width:0}
+.bc-body b{font-family:var(--f-display);font-size:1.3rem;line-height:1.15}
+.bc-week{font-size:.86rem;color:var(--fg);opacity:.8}
+.bc-pct{font-family:var(--f-display);font-weight:700;font-size:1.3rem;color:var(--bc);font-variant-numeric:tabular-nums}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .bc-pct{color:var(--fg)}}
+:root[data-theme="dark"] .bc-pct{color:var(--fg)}
+.excerpt{margin:0;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--green);border-radius:12px;padding:14px 16px;font-size:1.05rem;line-height:1.55;font-style:italic}
+.cont{color:var(--muted);font-style:italic;font-size:.9em}
+/* Barra de rolagem: a do navegador fica escondida; uma fina aparece só enquanto rola */
+html{scrollbar-width:none}
+html::-webkit-scrollbar{display:none}
+.sb-thumb{position:fixed;right:max(3px,env(safe-area-inset-right,0px));top:0;width:6px;border-radius:6px;background:color-mix(in srgb,var(--fg) 38%,transparent);opacity:0;transition:opacity .35s,width .15s;z-index:60;touch-action:none;cursor:grab}
+.sb-thumb.show,.sb-thumb.drag{opacity:1}
+.sb-thumb:hover,.sb-thumb.drag{width:9px;opacity:1}
+@media (hover:none){.sb-thumb{pointer-events:none}}
+/* Barra de rolagem: some quando a página está parada e aparece fina ao rolar */
+html{scrollbar-width:thin;scrollbar-color:transparent transparent;transition:scrollbar-color .3s}
+html.scrolling{scrollbar-color:color-mix(in srgb,var(--muted) 70%,transparent) transparent}
+@supports not (scrollbar-color:red blue){
+  html::-webkit-scrollbar{width:8px;background:transparent}
+  html::-webkit-scrollbar-thumb{background:transparent;border-radius:8px}
+  html.scrolling::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--muted) 70%,transparent)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -267,6 +323,8 @@ select{font:inherit;color:var(--fg);background:var(--surface);border:1px solid v
 <div id="app"></div>
 
 <script src="/data.js"></script>
+<script src="/data-maior.js"></script>
+<script src="/data-conf.js"></script>
 <script src="/app.js"></script>
 </body>
 </html>
