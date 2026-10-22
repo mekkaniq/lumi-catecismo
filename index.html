@@ -162,6 +162,10 @@ section{display:flex;flex-direction:column;gap:12px}
 .feedback .fb{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
 .feedback h3{font-size:1.2rem;color:var(--ok)}
 .feedback.bad h3{color:var(--bad)}
+.feedback.meh{border-top-color:var(--gold)}
+.feedback.meh h3{color:color-mix(in srgb,var(--gold) 72%,var(--fg))}
+.lumi.tilt{animation:tilt .6s ease-in-out}
+@keyframes tilt{30%{transform:rotate(-6deg)}70%{transform:rotate(4deg)}}
 .feedback p{margin:0;font-size:.98rem;max-height:30vh;overflow:auto}
 
 .result{text-align:center;align-items:center}

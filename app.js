@@ -35,7 +35,8 @@ function lumiSVG(mood='idle'){
     cheer:`<path d="M63.8 33q2.2-2.8 4.4 0M71.8 33q2.2-2.8 4.4 0" ${W} stroke-width="1.7"/>`,
     sad:`<path d="M63.4 30.4l4-1.8M76.6 30.4l-4-1.8" ${W} stroke-width="1.4"/><circle cx="66" cy="33" r="1.6" fill="#fff"/><circle cx="74" cy="33" r="1.6" fill="#fff"/>`,
     think:`<circle cx="66" cy="32" r="2.6" fill="#fff"/><circle cx="74" cy="32" r="2.6" fill="#fff"/><circle cx="67" cy="30.9" r="1.15" fill="var(--face)"/><circle cx="75" cy="30.9" r="1.15" fill="var(--face)"/>`,
-    sleep:`<path d="M63.8 32q2.2 2.2 4.4 0M71.8 32q2.2 2.2 4.4 0" ${W} stroke-width="1.6"/>`
+    sleep:`<path d="M63.8 32q2.2 2.2 4.4 0M71.8 32q2.2 2.2 4.4 0" ${W} stroke-width="1.6"/>`,
+    meh:`<path d="M71.8 28.4l4.4-.9" ${W} stroke-width="1.4"/><circle cx="65.4" cy="32.4" r="1.9" fill="#fff"/><circle cx="73.4" cy="32.4" r="1.9" fill="#fff"/>`
   }[mood]||'';
   const mouth={
     idle:`<path d="M66 39q3.5 3.2 7 0" ${W} stroke-width="1.7"/>`,
@@ -43,7 +44,8 @@ function lumiSVG(mood='idle'){
     cheer:`<path d="M65.4 38.4q4.1 6.4 8.2 0z" fill="#fff"/>`,
     sad:`<path d="M66 41.8q3.5-2.8 7 0" ${W} stroke-width="1.7"/>`,
     think:`<path d="M67.6 40.4h4" ${W} stroke-width="1.7"/>`,
-    sleep:`<circle cx="69.6" cy="40" r="1.3" ${W} stroke-width="1.3"/>`
+    sleep:`<circle cx="69.6" cy="40" r="1.3" ${W} stroke-width="1.3"/>`,
+    meh:`<path d="M65.8 40.4q1.8-1.4 3.6 0t3.6 0" ${W} stroke-width="1.6"/>`
   }[mood]||'';
   const cheeks=(mood==='happy'||mood==='cheer')?`<ellipse cx="62.8" cy="37.2" rx="2" ry="1.3" fill="#f2a0a6" opacity=".75"/><ellipse cx="77.2" cy="37.2" rx="2" ry="1.3" fill="#f2a0a6" opacity=".75"/>`:'';
   const extra={
@@ -64,7 +66,7 @@ function lumiSVG(mood='idle'){
 }
 function lumiReact(mood,ms=850){
   const el=document.querySelector('.lumi-live');if(!el)return;
-  el.innerHTML=lumiSVG(mood);el.firstElementChild.classList.add(mood==='sad'?'shake':'hop');
+  el.innerHTML=lumiSVG(mood);el.firstElementChild.classList.add(mood==='sad'?'shake':mood==='meh'?'tilt':'hop');
   clearTimeout(lumiReact.t);
   lumiReact.t=setTimeout(()=>{const e=document.querySelector('.lumi-live');if(e&&S.v==='game'&&!S.g.done)e.innerHTML=lumiSVG('think')},ms);
 }
@@ -273,21 +275,21 @@ function vGame(){
       ${g.done?'':`<div class="bank" style="flex-direction:column;align-items:stretch">${st.order.filter(i=>!st.used.has(i)).map(i=>`<button class="chip long" data-act="bpick" data-k="${i}">${esc(st.chunks[i])}</button>`).join('')}</div>`}
       ${g.miss?`<p class="miss">${g.miss} tentativa${g.miss>1?'s':''} errada${g.miss>1?'s':''}</p>`:''}`;
   }
-  const fb=g.done?`<div class="feedback ${g.correct?'':'bad'}"><div class="wrap"><div class="fb">
-    <h3>${g.correct?pick(PRAISE):'Vamos revisar'}</h3>
-    ${g.correct&&it.mode!=='quiz'?'':`<p><b>${n}.</b> ${esc(a)}</p>`}
+  const fb=g.done?`<div class="feedback ${g.mood==='sad'?'bad':g.mood==='meh'?'meh':''}"><div class="wrap"><div class="fb">
+    <h3>${g.mood==='cheer'?pick(PRAISE):g.mood==='meh'?(g.correct?'Quase perfeito!':'Quase!'):'Vamos revisar'}</h3>
+    ${g.mood==='cheer'&&it.mode!=='quiz'?'':`<p><b>${n}.</b> ${esc(a)}</p>`}
     <p class="ls">${esc(r)}</p>
     <div class="row"><button class="btn solid" data-act="cont">${g.i<g.items.length-1?'Continuar':'Ver resultado'}</button><button class="btn" data-act="speakA">▶ Ouvir</button></div>
   </div></div></div>`:'';
   return topbar(MODE_NAME[g.mode],'quit',`${g.i+1}/${g.items.length}`)+`
   <main class="wrap" style="padding-bottom:${g.done?'12px':'48px'}">
     <div class="dots">${dots}</div>
-    <div class="qhead"><div style="min-width:0"><div class="qnum">Pergunta ${n} · ${MODE_NAME[it.mode]}</div><div class="qtext" style="margin-top:6px">${esc(q)}</div></div><div class="lumi-live">${lumiSVG(g.done?(g.correct?'cheer':'sad'):'think')}</div></div>
+    <div class="qhead"><div style="min-width:0"><div class="qnum">Pergunta ${n} · ${MODE_NAME[it.mode]}</div><div class="qtext" style="margin-top:6px">${esc(q)}</div></div><div class="lumi-live">${lumiSVG(g.done?g.mood:'think')}</div></div>
     ${body}
   </main>${fb}`;
 }
 function answered(ok){
-  const g=S.g,n=g.items[g.i].n;g.done=true;g.correct=ok;
+  const g=S.g,n=g.items[g.i].n;g.done=true;g.correct=ok;g.mood=!g.miss?'cheer':g.miss===1?'meh':'sad';
   if(ok){g.ok++;P.m[n]=Math.min(3,(P.m[n]||0)+1)}
   P.seen[n]=1;markDay();save();render();
   const f=document.querySelector('.feedback');if(f)f.scrollIntoView({block:'end',behavior:'smooth'});
@@ -409,14 +411,14 @@ const ACT={
   review:()=>startGame('mix',range(1,107),'home'),
   quit:()=>go(S.g.back==='home'?'home':'unit'),
   again:()=>startGame(S.g.mode,S.g.pool,S.g.back),
-  qopt:b=>{const m=+b.dataset.m,n=S.g.items[S.g.i].n;S.g.st.chosen=m;answered(m===n)},
+  qopt:b=>{const m=+b.dataset.m,n=S.g.items[S.g.i].n;S.g.st.chosen=m;if(m!==n)S.g.miss=1;answered(m===n)},
   cpick:b=>{const g=S.g,st=g.st,k=+b.dataset.k,item=st.bank[k];
     const exp=norm(st.words[st.blanks[st.filled]]);
-    if(norm(item.w)===exp){item.used=true;st.filled++;if(st.filled>=st.blanks.length)return answered(g.miss===0);render();lumiReact('happy',700);}
-    else{g.miss++;b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');const m=document.querySelector('.miss');if(m)m.textContent=`${g.miss} tentativa${g.miss>1?'s':''} errada${g.miss>1?'s':''}`;else render();lumiReact('sad',900);}},
+    if(norm(item.w)===exp){item.used=true;st.filled++;if(st.filled>=st.blanks.length)return answered(g.miss<=1);render();lumiReact('happy',700);}
+    else{g.miss++;b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');const m=document.querySelector('.miss');if(m)m.textContent=`${g.miss} tentativa${g.miss>1?'s':''} errada${g.miss>1?'s':''}`;else render();lumiReact(g.miss>=2?'sad':'meh',900);}},
   bpick:b=>{const g=S.g,st=g.st,k=+b.dataset.k;const exp=st.chunks[st.placed.length];
     if(st.chunks[k]===exp){st.placed.push(k);st.used.add(k);if(st.placed.length===st.chunks.length)return answered(g.miss<=1);render();lumiReact('happy',700);}
-    else{g.miss++;b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');const m=document.querySelector('.miss');if(m)m.textContent=`${g.miss} tentativa${g.miss>1?'s':''} errada${g.miss>1?'s':''}`;else render();lumiReact('sad',900);}},
+    else{g.miss++;b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');const m=document.querySelector('.miss');if(m)m.textContent=`${g.miss} tentativa${g.miss>1?'s':''} errada${g.miss>1?'s':''}`;else render();lumiReact(g.miss>=2?'sad':'meh',900);}},
   cont:()=>{const g=S.g;g.i++;if(g.i>=g.items.length)return go('result');setupItem();go('game')},
   speakA:()=>{const n=S.g.items[S.g.i].n;speak(Q[n-1][0]+'. '+Q[n-1][1])},
   class:()=>go('class',{cu:P.last!=null?P.last:0,ci:0,crev:false}),
