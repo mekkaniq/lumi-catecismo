@@ -233,7 +233,7 @@ function vHub(){
       <div class="shelf">${ORDER.map(id=>{const b=BOOKS[id],p=pctOf(id),wk=weekQ(b);
         return `<button class="bookcard" data-act="openbook" data-b="${id}" style="--bc:${b.color}">
           <span class="spine" aria-hidden="true"></span>
-          <span class="bc-body"><span class="eyebrow">${b.tag}</span><b>${b.name}</b>
+          <span class="bc-body"><span class="eyebrow">${b.tag}</span><b>${textRoll(b.name)}</b>
           <span class="ls">${id==='conf'?`33 capítulos · ${b.items.length} seções`:`${b.items.length} perguntas · ${b.units.length} lições`}</span>
           <span class="bc-week">${id==='conf'?'Seção':'Pergunta'} da semana: ${id==='conf'?esc(b.items[wk.n-1].label):wk.n}</span>
           <span class="mini"><i style="width:${p}%"></i></span></span>
@@ -520,6 +520,7 @@ function renderLumiRow(anim){
 function render(){
   app.innerHTML=({hub:vHub,book:vBook,unit:vUnit,study:vStudy,game:vGame,result:vResult,class:vClass,text:vText}[S.v]||vHub)();
   if(S.v==='hub'||S.v==='book')initRoll();
+  initFX();if(S.v==='hub')initCardRoll();
   if(S.v==='result'&&S.g&&S.g.ok===S.g.items.length&&!S.g.party&&!isConf()){S.g.party=1;confetti()}
 }
 
@@ -550,11 +551,75 @@ function initRoll(){
   window.addEventListener('scroll',onScroll,{passive:true});
 }
 
+/* ===== Text roll (efeito inspirado no Skiper UI 58, refeito sem bibliotecas) =====
+   Cada letra tem duas cópias; ao passar o dedo/mouse a de cima sobe e a de baixo entra,
+   com atraso que começa no centro da palavra. */
+function textRoll(text){
+  const ch=[...text],mid=(ch.length-1)/2;
+  return `<span class="tr" aria-label="${esc(text)}">${text.split(' ').map((w,wi,arr)=>{
+    const start=arr.slice(0,wi).join(' ').length+(wi?1:0);
+    return `<span class="tr-w" aria-hidden="true">${[...w].map((c,i)=>`<span class="tr-c" style="--d:${Math.abs(start+i-mid).toFixed(1)}"><span>${esc(c)}</span><span>${esc(c)}</span></span>`).join('')}</span>`}).join(' ')}</span>`;
+}
+/* no celular não há "passar o mouse": cada título rola sozinho ao aparecer na tela */
+function initCardRoll(){
+  if(!('IntersectionObserver' in window)||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))return;
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;const c=e.target;io.unobserve(c);
+    setTimeout(()=>{c.classList.add('roll');setTimeout(()=>c.classList.remove('roll'),1500)},+c.dataset.k*260+500)}),{threshold:.6});
+  document.querySelectorAll('.bookcard').forEach((c,k)=>{c.dataset.k=k;io.observe(c)});
+}
+
+/* ===== Fundo em shader: gradiente vivo, luz de glória no alto e brasa da sarça embaixo ===== */
+const FXC={hub:['#0b2619','#2c6a4c','#e7b552'],breve:['#0b2619','#2a6b45','#e7b552'],maior:['#24090e','#83303a','#e7b552'],conf:['#08202c','#26627f','#ecc56e']};
+const FS=`precision mediump float;uniform vec2 r;uniform float t;uniform vec3 A,B,C;
+float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+1.),f.x),f.y);}
+float fbm(vec2 p){float v=0.,s=.5;for(int i=0;i<4;i++){v+=s*n(p);p*=2.03;s*=.5;}return v;}
+void main(){vec2 uv=gl_FragCoord.xy/r;float k=r.x/r.y;vec2 p=vec2(uv.x*k,uv.y);float tt=t*.045;
+vec2 q=vec2(fbm(p*1.5+tt),fbm(p*1.5-tt+3.1));float f=fbm(p*1.2+q*1.9+tt*.7);
+vec3 col=mix(A,B,smoothstep(.2,.9,f));col=mix(col,A,smoothstep(.55,1.,1.-uv.y)*.35);
+vec2 L=vec2(.12*k,1.08);float d=length(p-L);float ang=atan(p.y-L.y,p.x-L.x);
+float rays=pow(.5+.5*sin(ang*11.+tt*5.+fbm(vec2(ang*2.,tt*2.))*5.),4.)*exp(-d*1.15);
+col+=C*(exp(-d*1.7)*.32+rays*.13);
+float e=exp(-length(p-vec2(.88*k,.02))*2.2);col+=C*e*(.24+.06*sin(t*1.9));
+col*=.8+.2*smoothstep(1.25,.15,length(uv-vec2(.5,.6)));
+col+=(h(gl_FragCoord.xy+fract(t))-.5)*.04;gl_FragColor=vec4(col,1.);}`;
+let FX=null;
+function initFX(){
+  const band=document.querySelector('.band');if(!band)return;
+  if(!FX){const cv=document.createElement('canvas');cv.className='fx';cv.setAttribute('aria-hidden','true');
+    const gl=cv.getContext('webgl',{antialias:false,depth:false,powerPreference:'low-power'});if(!gl){FX={off:true};return}
+    const sh=(t,src)=>{const o=gl.createShader(t);gl.shaderSource(o,src);gl.compileShader(o);return o};
+    const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,'attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}'));
+    gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);
+    if(!gl.getProgramParameter(pr,gl.LINK_STATUS)){FX={off:true};return}
+    gl.useProgram(pr);gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+    const loc=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+    const U=k=>gl.getUniformLocation(pr,k);FX={cv,gl,u:{r:U('r'),t:U('t'),A:U('A'),B:U('B'),C:U('C')},t0:performance.now(),raf:0};}
+  if(FX.off)return;
+  band.prepend(FX.cv);
+  const hex=x=>[1,3,5].map(i=>parseInt(x.slice(i,i+2),16)/255);
+  const cols=FXC[S.v==='hub'?'hub':B.id];const {gl,u}=FX;
+  gl.uniform3fv(u.A,hex(cols[0]));gl.uniform3fv(u.B,hex(cols[1]));gl.uniform3fv(u.C,hex(cols[2]));
+  const still=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  cancelAnimationFrame(FX.raf);
+  const frame=now=>{
+    if(!FX.cv.isConnected)return;
+    const rc=FX.cv.getBoundingClientRect();
+    if(rc.bottom>0&&!document.hidden){
+      const sc=Math.min(window.devicePixelRatio||1,2)*.5,w=Math.max(2,Math.round(rc.width*sc)),h=Math.max(2,Math.round(rc.height*sc));
+      if(FX.cv.width!==w||FX.cv.height!==h){FX.cv.width=w;FX.cv.height=h;gl.viewport(0,0,w,h)}
+      gl.uniform2f(u.r,w,h);gl.uniform1f(u.t,(now-FX.t0)/1000+7);gl.drawArrays(gl.TRIANGLES,0,3);}
+    if(!still)FX.raf=requestAnimationFrame(frame);
+  };
+  FX.raf=requestAnimationFrame(frame);
+}
+
 /* ===== ações ===== */
 function openBook(id){setBook(id);P.lastBook=id;save();S.poke=null;go('book')}
 const ACT={
   home:()=>{S.poke=null;go('hub')},
-  openbook:b=>{const id=b.dataset.b;const sc=document.querySelector('.lumi-on-books .lumi');
+  openbook:b=>{const id=b.dataset.b;
+    if(b.classList.contains('bookcard')&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){b.classList.add('roll');return setTimeout(()=>openBook(id),430)}const sc=document.querySelector('.lumi-on-books .lumi');
     if(sc&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){sc.classList.add('hop');setTimeout(()=>openBook(id),280)}else openBook(id)},
   bookhome:()=>{S.poke=null;go('book')},
   unit:b=>{const u=+b.dataset.u;bp().last=u;save();go('unit',{u})},
@@ -595,6 +660,8 @@ const ACT={
   sc:b=>{P.score=P.score||{a:0,b:0,on:true};const t=b.dataset.t;P.score[t]=Math.max(0,P.score[t]+(+b.dataset.v));save();render();if(+b.dataset.v>0){const l=document.querySelector('.class-lumi .lumi');if(l){l.outerHTML=lumiSVG('cheer');document.querySelector('.class-lumi .lumi').classList.add('hop')}}},
   sczero:()=>{P.score={a:0,b:0,on:true};save();render()}
 };
+/* luz que segue o dedo/mouse nos cartões */
+app.addEventListener('pointermove',e=>{const c=e.target.closest('.bookcard,.tool,.week,.continue');if(!c)return;const r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px')},{passive:true});
 app.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const f=ACT[b.dataset.act];if(f)f(b)});
 app.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('g[data-act]')){e.preventDefault();ACT[e.target.dataset.act](e.target)}});
 app.addEventListener('change',e=>{

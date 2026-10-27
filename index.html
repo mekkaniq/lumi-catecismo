@@ -316,6 +316,51 @@ html.scrolling{scrollbar-color:color-mix(in srgb,var(--muted) 70%,transparent) t
   html::-webkit-scrollbar{width:8px;background:transparent}
   html::-webkit-scrollbar-thumb{background:transparent;border-radius:8px}
   html.scrolling::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--muted) 70%,transparent)}}
+/* ===== Profundidade, luz e leitura ===== */
+:root{--sh-1:0 1px 2px rgba(16,32,24,.06),0 4px 14px -6px rgba(16,32,24,.12);--sh-2:0 2px 4px rgba(16,32,24,.06),0 18px 40px -16px rgba(16,32,24,.28);--hl:rgba(255,255,255,.7)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--sh-1:0 1px 2px rgba(0,0,0,.4),0 6px 18px -8px rgba(0,0,0,.6);--sh-2:0 2px 6px rgba(0,0,0,.4),0 22px 44px -18px rgba(0,0,0,.75);--hl:rgba(255,255,255,.06)}}
+:root[data-theme="dark"]{--sh-1:0 1px 2px rgba(0,0,0,.4),0 6px 18px -8px rgba(0,0,0,.6);--sh-2:0 2px 6px rgba(0,0,0,.4),0 22px 44px -18px rgba(0,0,0,.75);--hl:rgba(255,255,255,.06)}
+body{background:radial-gradient(900px 520px at 85% -120px,color-mix(in srgb,var(--green) 9%,transparent),transparent 70%),var(--bg);background-attachment:fixed;line-height:1.55}
+.band{position:relative;overflow:hidden;isolation:isolate;border-radius:0 0 28px 28px;box-shadow:0 18px 40px -22px rgba(0,0,0,.55)}
+.band canvas.fx{position:absolute;inset:0;width:100%;height:100%;z-index:-1;display:block}
+.band::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.06),transparent 30%),linear-gradient(0deg,rgba(0,0,0,.22),transparent 45%)}
+.band .wrap{position:relative}
+.band .eyebrow{color:#ecc97a;letter-spacing:.18em}
+.band h1{font-size:clamp(2rem,8.4vw,2.9rem);letter-spacing:-.012em;line-height:1.05;text-shadow:0 2px 24px rgba(0,0,0,.35)}
+.band .hero-text p{opacity:1;color:color-mix(in srgb,var(--band-fg) 90%,transparent);font-size:1.06rem;max-width:44ch;text-shadow:0 1px 14px rgba(0,0,0,.4)}
+.hero-stats{opacity:1;gap:8px}
+.hero-stats span{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:4px 11px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.bubble{box-shadow:0 1px 0 var(--hl) inset,0 14px 34px -12px rgba(0,0,0,.5)}
+.back-hub{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.14)}
+.topbar{background:color-mix(in srgb,var(--green-deep) 84%,transparent);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);box-shadow:0 8px 24px -16px rgba(0,0,0,.5)}
+main{gap:30px}
+.sec-h h2{font-size:1.35rem;letter-spacing:-.005em}
+/* cartões com relevo e luz que segue o dedo */
+.tool,.week,.continue,.card,.bookcard{position:relative;overflow:hidden;box-shadow:var(--hl) 0 1px 0 inset,var(--sh-1);transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s,border-color .3s}
+.tool::before,.week::before,.continue::before,.bookcard::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .35s;background:radial-gradient(260px circle at var(--mx,70%) var(--my,0%),color-mix(in srgb,var(--bc,var(--green)) 16%,transparent),transparent 65%)}
+.tool:hover,.continue:hover,.bookcard:hover{transform:translateY(-3px);box-shadow:var(--hl) 0 1px 0 inset,var(--sh-2)}
+.tool:hover::before,.week:hover::before,.continue:hover::before,.bookcard:hover::before,.bookcard.roll::before{opacity:1}
+.tool.primary{background:linear-gradient(160deg,color-mix(in srgb,var(--primary) 82%,#fff),var(--primary) 45%,color-mix(in srgb,var(--primary) 78%,#000));box-shadow:0 1px 0 rgba(255,255,255,.22) inset,0 14px 30px -14px color-mix(in srgb,var(--primary) 85%,transparent)}
+.week{background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 7%,var(--surface)),var(--surface) 60%)}
+.lesson{border-radius:12px;transition:background .25s}
+.lesson:hover{background:color-mix(in srgb,var(--green) 6%,transparent)}
+.atext{line-height:1.7}
+.btn.solid{background:linear-gradient(180deg,color-mix(in srgb,var(--primary) 85%,#fff),var(--primary));box-shadow:0 1px 0 rgba(255,255,255,.2) inset,0 8px 18px -10px var(--primary)}
+/* estante dos três livros */
+.shelf{gap:16px}
+.bookcard{grid-template-columns:18px 1fr auto;min-height:132px;border-color:color-mix(in srgb,var(--bc) 22%,var(--line));background:linear-gradient(120deg,color-mix(in srgb,var(--bc) 7%,var(--surface)),var(--surface) 55%)}
+.bookcard .spine{background:linear-gradient(90deg,color-mix(in srgb,var(--bc) 65%,#000),var(--bc) 35%,color-mix(in srgb,var(--bc) 70%,#fff) 58%,var(--bc) 78%);box-shadow:4px 0 12px -4px rgba(0,0,0,.35)}
+.bc-body b{font-size:1.45rem;letter-spacing:-.01em}
+.bookcard:active{transform:scale(.985)}
+/* Text roll */
+.tr-w{display:inline-block;white-space:nowrap}
+.tr-c{position:relative;display:inline-block;overflow:hidden;vertical-align:top;line-height:1.18;height:1.18em}
+.tr-c>span{display:block;transition:transform .55s cubic-bezier(.65,0,.35,1);transition-delay:calc(var(--d)*28ms)}
+.tr-c>span+span{position:absolute;left:0;top:0;transform:translateY(105%);color:color-mix(in srgb,var(--bc) 78%,var(--fg))}
+.bookcard:hover .tr-c>span:first-child,.bookcard:focus-visible .tr-c>span:first-child,.bookcard.roll .tr-c>span:first-child{transform:translateY(-105%)}
+.bookcard:hover .tr-c>span+span,.bookcard:focus-visible .tr-c>span+span,.bookcard.roll .tr-c>span+span{transform:translateY(0)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tr-c>span+span{color:color-mix(in srgb,var(--bc) 45%,#fff)}}
+:root[data-theme="dark"] .tr-c>span+span{color:color-mix(in srgb,var(--bc) 45%,#fff)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
