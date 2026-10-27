@@ -233,7 +233,7 @@ function vHub(){
       <div class="shelf">${ORDER.map(id=>{const b=BOOKS[id],p=pctOf(id),wk=weekQ(b);
         return `<button class="bookcard" data-act="openbook" data-b="${id}" style="--bc:${b.color}">
           <span class="spine" aria-hidden="true"></span>
-          <span class="bc-body"><span class="eyebrow">${b.tag}</span><b>${textRoll(b.name)}</b>
+          <span class="bc-body"><span class="eyebrow">${b.tag}</span><b>${b.name}</b>
           <span class="ls">${id==='conf'?`33 capítulos · ${b.items.length} seções`:`${b.items.length} perguntas · ${b.units.length} lições`}</span>
           <span class="bc-week">${id==='conf'?'Seção':'Pergunta'} da semana: ${id==='conf'?esc(b.items[wk.n-1].label):wk.n}</span>
           <span class="mini"><i style="width:${p}%"></i></span></span>
@@ -520,7 +520,7 @@ function renderLumiRow(anim){
 function render(){
   app.innerHTML=({hub:vHub,book:vBook,unit:vUnit,study:vStudy,game:vGame,result:vResult,class:vClass,text:vText}[S.v]||vHub)();
   if(S.v==='hub'||S.v==='book')initRoll();
-  initFX();if(S.v==='hub')initCardRoll();
+  initFX();
   if(S.v==='result'&&S.g&&S.g.ok===S.g.items.length&&!S.g.party&&!isConf()){S.g.party=1;confetti()}
 }
 
@@ -585,7 +585,7 @@ col*=.8+.2*smoothstep(1.25,.15,length(uv-vec2(.5,.6)));
 col+=(h(gl_FragCoord.xy+fract(t))-.5)*.04;gl_FragColor=vec4(col,1.);}`;
 let FX=null;
 function initFX(){
-  const band=document.querySelector('.band');if(!band)return;
+  const band=document.querySelector('.band')||document.querySelector('.topbar');if(!band)return;
   if(!FX){const cv=document.createElement('canvas');cv.className='fx';cv.setAttribute('aria-hidden','true');
     const gl=cv.getContext('webgl',{antialias:false,depth:false,powerPreference:'low-power'});if(!gl){FX={off:true};return}
     const sh=(t,src)=>{const o=gl.createShader(t);gl.shaderSource(o,src);gl.compileShader(o);return o};
@@ -598,7 +598,7 @@ function initFX(){
   if(FX.off)return;
   band.prepend(FX.cv);
   const hex=x=>[1,3,5].map(i=>parseInt(x.slice(i,i+2),16)/255);
-  const cols=FXC[S.v==='hub'?'hub':B.id];const {gl,u}=FX;
+  const cols=FXC[(S.v==='hub'||S.v==='text')?'hub':B.id];const {gl,u}=FX;
   gl.uniform3fv(u.A,hex(cols[0]));gl.uniform3fv(u.B,hex(cols[1]));gl.uniform3fv(u.C,hex(cols[2]));
   const still=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
   cancelAnimationFrame(FX.raf);
@@ -619,7 +619,7 @@ function openBook(id){setBook(id);P.lastBook=id;save();S.poke=null;go('book')}
 const ACT={
   home:()=>{S.poke=null;go('hub')},
   openbook:b=>{const id=b.dataset.b;
-    if(b.classList.contains('bookcard')&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){b.classList.add('roll');return setTimeout(()=>openBook(id),430)}const sc=document.querySelector('.lumi-on-books .lumi');
+const sc=document.querySelector('.lumi-on-books .lumi');
     if(sc&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){sc.classList.add('hop');setTimeout(()=>openBook(id),280)}else openBook(id)},
   bookhome:()=>{S.poke=null;go('book')},
   unit:b=>{const u=+b.dataset.u;bp().last=u;save();go('unit',{u})},
