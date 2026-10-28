@@ -212,15 +212,30 @@ function go(v,extra){
   try{history.replaceState(null,'',v==='hub'?location.pathname:location.pathname+'#'+B.hash)}catch(e){}
   render();window.scrollTo(0,0);
 }
+const FONTS=[1,1.15,1.3];
+function fsBtn(){const k=FONTS.indexOf(P.fs||1);return `<button class="fs-btn" data-act="fontsize" aria-label="Tamanho da letra: ${['normal','grande','maior'][k<0?0:k]}. Toque para mudar">A<span>A</span></button>`}
+function applyFS(){document.documentElement.style.setProperty('--fs',P.fs||1)}
 function topbar(title,back,right){
-  return `<div class="topbar"><div class="wrap"><button class="back" data-act="${back}" aria-label="Voltar">‹ Voltar</button><span class="tt">${esc(title)}</span>${right?`<span class="count">${right}</span>`:''}</div></div>`;
+  return `<div class="topbar"><div class="wrap"><button class="back" data-act="${back}" aria-label="Voltar">‹ Voltar</button><span class="tt">${esc(title)}</span>${right?`<span class="count">${right}</span>`:''}${fsBtn()}</div></div>`;
 }
+
+/* ===== instalar como app ===== */
+function installCard(){
+  const standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone;
+  if(standalone||P.hideInstall)return '';
+  const ios=/iP(hone|ad|od)/.test(navigator.userAgent);
+  return `<section class="install"><div><b>Use como aplicativo</b><span>${ios?'No Safari, toque em <b>Compartilhar</b> e depois em <b>Adicionar à Tela de Início</b>.':'No navegador, abra o menu <b>⋮</b> e toque em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.'} Assim a Lumi abre direto e funciona sem internet.</span></div><button class="btn sm" data-act="hideinstall">Entendi</button></section>`;
+}
+/* cor da barra do celular acompanha o livro */
+const BARC={hub:'#123d26',breve:'#123d26',maior:'#3f161b',conf:'#102c3a'};
+function barColor(){const m=document.querySelector('meta[name=theme-color]');if(m)m.content=BARC[document.documentElement.dataset.book]||BARC.hub}
 
 /* ===== capa geral: Lumi Catecismos ===== */
 function vHub(){
   const line=hubLine();
   return `
   <div class="band hub"><div class="wrap hero">
+    <div class="hero-top"><span></span>${fsBtn()}</div>
     <div class="hero-text"><p class="eyebrow">Westminster · em jogos</p>
     <h1 class="roll" aria-label="Lumi Catecismos">${rollHTML('Lumi Catecismos')}</h1>
     <p>O Breve Catecismo, o Catecismo Maior e a Confissão de Fé, para aprender em casa e ensinar na igreja.</p></div>
@@ -239,6 +254,7 @@ function vHub(){
           <span class="mini"><i style="width:${p}%"></i></span></span>
           <span class="bc-pct">${p}%</span></button>`}).join('')}</div>
     </section>
+    ${installCard()}
     <section>
       <div class="sec-h"><h2>Na igreja</h2></div>
       <div class="tools">
@@ -253,7 +269,7 @@ function vHub(){
         <button class="tool" data-act="text" data-t="credo"><b>Credo</b><span>Credo Apostólico</span></button>
       </div>
     </section>
-    <p class="foot">O progresso de cada livro fica salvo neste aparelho.</p>
+    <p class="foot">Funciona sem internet depois do primeiro acesso.<br>O progresso de cada livro fica salvo neste aparelho.<br><span class="sign">Lumi Catecismos · Padrões de Westminster</span></p>
   </main>`;
 }
 
@@ -265,7 +281,7 @@ function vBook(){
   const wk=weekQ(),line=lumiLine(),w=it(wk.n);
   return `
   <div class="band"><div class="wrap hero">
-    <button class="back-hub" data-act="home">‹ Lumi Catecismos</button>
+    <div class="hero-top"><button class="back-hub" data-act="home">‹ Lumi Catecismos</button>${fsBtn()}</div>
     <div class="hero-text"><p class="eyebrow">${B.tag}</p>
     <h1 class="roll" aria-label="${B.full}">${rollHTML(B.full)}</h1>
     <p>${B.sub}</p></div>
@@ -520,7 +536,7 @@ function renderLumiRow(anim){
 function render(){
   app.innerHTML=({hub:vHub,book:vBook,unit:vUnit,study:vStudy,game:vGame,result:vResult,class:vClass,text:vText}[S.v]||vHub)();
   if(S.v==='hub'||S.v==='book')initRoll();
-  initFX();
+  initFX();barColor();
   if(S.v==='result'&&S.g&&S.g.ok===S.g.items.length&&!S.g.party&&!isConf()){S.g.party=1;confetti()}
 }
 
@@ -618,6 +634,8 @@ function initFX(){
 function openBook(id){setBook(id);P.lastBook=id;save();S.poke=null;go('book')}
 const ACT={
   home:()=>{S.poke=null;go('hub')},
+  fontsize:()=>{const k=FONTS.indexOf(P.fs||1);P.fs=FONTS[(k+1)%FONTS.length];save();applyFS();render()},
+  hideinstall:()=>{P.hideInstall=1;save();render()},
   openbook:b=>{const id=b.dataset.b;
 const sc=document.querySelector('.lumi-on-books .lumi');
     if(sc&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){sc.classList.add('hop');setTimeout(()=>openBook(id),280)}else openBook(id)},
@@ -681,6 +699,8 @@ function fromHash(){const h=(location.hash||'').slice(1);const id=ORDER.find(k=>
   if(id){setBook(id);S.v='book';S.poke=null}else{S.v='hub'}
   document.documentElement.dataset.book=id||'hub';render();window.scrollTo(0,0)}
 window.addEventListener('hashchange',fromHash);
+applyFS();
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='127.0.0.1'))try{navigator.serviceWorker.register('/sw.js').catch(()=>{})}catch(e){}
 /* mostra a barra de rolagem só enquanto a página rola */
 let scrollT=0;window.addEventListener('scroll',()=>{document.documentElement.classList.add('scrolling');clearTimeout(scrollT);scrollT=setTimeout(()=>document.documentElement.classList.remove('scrolling'),900)},{passive:true});
 
