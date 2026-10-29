@@ -23,5 +23,18 @@ final class Speaker {
         synth.speak(u)
     }
 
+    /// Falinhas da Lumi: voz mais aguda e respeitando o botão de silencioso do iPhone.
+    func chatter(_ text: String) {
+        try? AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
+        try? AVAudioSession.sharedInstance().setActive(true)
+        synth.stopSpeaking(at: .immediate)
+        let u = AVSpeechUtterance(string: text)
+        u.voice = AVSpeechSynthesisVoice(language: "pt-BR")
+        u.rate = 0.5
+        u.pitchMultiplier = 1.45
+        u.volume = 0.9
+        synth.speak(u)
+    }
+
     func stop() { synth.stopSpeaking(at: .immediate) }
 }

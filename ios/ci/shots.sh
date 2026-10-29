@@ -26,6 +26,7 @@ shot() { # nome, argumentos...
 }
 xcrun simctl ui "$UDID" appearance light
 shot hub -shot hub -demo
+shot hub-tap -shot hub -demo -lumitap
 shot book-breve -shot book -book breve -demo
 shot book-maior -shot book -book maior -demo
 shot book-conf -shot book -book conf -demo

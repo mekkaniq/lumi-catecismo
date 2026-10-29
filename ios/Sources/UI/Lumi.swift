@@ -86,6 +86,7 @@ struct BooksScene: View {
 
     private let ox: CGFloat = 0
     private let oy: CGFloat = 30
+    @State private var phrase: String? = nil
 
     var body: some View {
         GeometryReader { geo in
@@ -101,10 +102,19 @@ struct BooksScene: View {
                 bookH("conf", x: 110, y: 121, w: 164, h: 29, label: "CONFISSÃO", left: true, s: s)
                 bookV(s: s)
 
-                LumiView(mood: .happy, pose: .dica)
-                    .frame(width: 128 * s, height: 140 * s)
-                    .position(x: 182 * s, y: (121 + oy - 62) * s)
-                    .allowsHitTesting(false)
+                PlayfulLumi(basePose: .dica) { p in
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { phrase = p }
+                }
+                .frame(width: 128 * s, height: 140 * s)
+                .position(x: 182 * s, y: (121 + oy - 62) * s)
+
+                if let phrase {
+                    SpeechPop(text: phrase, size: 11.5 * s)
+                        .frame(width: 112 * s)
+                        .position(x: 60 * s, y: (50 + oy) * s)
+                        .transition(.scale(scale: 0.6, anchor: .trailing).combined(with: .opacity))
+                        .allowsHitTesting(false)
+                }
 
                 Image(systemName: "sparkle")
                     .font(.system(size: 14 * s))
@@ -174,5 +184,153 @@ struct BooksScene: View {
         .buttonStyle(PressStyle())
         .position(x: 307 * s, y: (86 + oy + 47) * s)
         .accessibilityLabel("Abrir Breve Catecismo")
+    }
+}
+
+
+/// Balão curto ao lado da Lumi, com a pontinha apontando para ela.
+struct SpeechPop: View {
+    let text: String
+    var size: CGFloat = 12
+
+    var body: some View {
+        Text(text)
+            .font(.system(size: size, weight: .semibold, design: .rounded))
+            .foregroundStyle(Color(hex: 0x1d2420))
+            .multilineTextAlignment(.leading)
+            .minimumScaleFactor(0.8)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .background(.white, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(alignment: .trailing) {
+                Triangle()
+                    .fill(.white)
+                    .frame(width: 10, height: 12)
+                    .rotationEffect(.degrees(135))
+                    .offset(x: 6, y: 6)
+            }
+            .shadow(color: .black.opacity(0.3), radius: 8, y: 4)
+    }
+}
+
+/// A Lumi que reage ao toque: ri de cócegas, dança, pula, dá uma voltinha, cochila e fala.
+struct PlayfulLumi: View {
+    var basePose: LumiPose = .dica
+    var onPhrase: (String?) -> Void
+
+    private enum Act { case tickle, hop, dance, spin, calm }
+    private struct Move {
+        let act: Act
+        let pose: LumiPose
+        let text: String
+    }
+
+    private let moves: [Move] = [
+        Move(act: .tickle, pose: .festa, text: "Hihi! Cócegas! Pare, pare!"),
+        Move(act: .hop, pose: .oi, text: "Oi! Que bom que você veio!"),
+        Move(act: .dance, pose: .festa, text: "Vou dançar para a glória de Deus!"),
+        Move(act: .calm, pose: .dica, text: "O fim principal do homem é glorificar a Deus e gozá-lo para sempre."),
+        Move(act: .calm, pose: .dica, text: "Toque num livro e vamos estudar juntos!"),
+        Move(act: .calm, pose: .dormindo, text: "Zzz… ah! Você me acordou!"),
+        Move(act: .calm, pose: .pensando, text: "Hmm… qual será a pergunta de hoje?"),
+        Move(act: .tickle, pose: .oi, text: "Ei! Isso faz cócegas, viu?"),
+        Move(act: .hop, pose: .festa, text: "Eba! Vamos aprender!"),
+        Move(act: .dance, pose: .oi, text: "Lá lá lá! Quem quer dançar comigo?"),
+    ]
+
+    @State private var pose: LumiPose? = nil
+    @State private var rot: Double = 0
+    @State private var hop: CGFloat = 0
+    @State private var turn: Double = 0
+    @State private var taps: [Date] = []
+    @State private var last = -1
+    @State private var job: Task<Void, Never>? = nil
+
+    var body: some View {
+        LumiView(mood: .happy, pose: pose ?? basePose)
+            .rotationEffect(.degrees(rot), anchor: .bottom)
+            .offset(y: hop)
+            .rotation3DEffect(.degrees(turn), axis: (x: 0, y: 1, z: 0))
+            .contentShape(Rectangle())
+            .onTapGesture { tap() }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Lumi. Toque para brincar com ela")
+            .accessibilityAddTraits(.isButton)
+            .onAppear {
+                // só para a captura de tela do CI
+                if ProcessInfo.processInfo.arguments.contains("-lumitap") {
+                    Task { @MainActor in
+                        try? await Task.sleep(nanoseconds: 3_800_000_000)
+                        tap()
+                    }
+                }
+            }
+    }
+
+    private func tap() {
+        let now = Date()
+        taps = taps.filter { now.timeIntervalSince($0) < 2.5 } + [now]
+        job?.cancel()
+        let move: Move
+        if taps.count >= 6 {
+            move = Move(act: .spin, pose: .festa, text: "Hahaha! Chega, chega! Cócegas demais!")
+            taps = []
+        } else {
+            var k = Int.random(in: 0..<moves.count)
+            while k == last { k = Int.random(in: 0..<moves.count) }
+            last = k
+            move = moves[k]
+        }
+        Haptics.tap()
+        Speaker.shared.chatter(move.text)
+        job = Task { @MainActor in await perform(move) }
+    }
+
+    @MainActor
+    private func pause(_ seconds: Double) async -> Bool {
+        try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+        return !Task.isCancelled
+    }
+
+    @MainActor
+    private func perform(_ m: Move) async {
+        withAnimation(.easeOut(duration: 0.1)) { rot = 0; hop = 0 }
+        pose = m.pose
+        onPhrase(m.text)
+
+        switch m.act {
+        case .tickle:
+            for i in 0..<7 {
+                withAnimation(.easeInOut(duration: 0.07)) { rot = i % 2 == 0 ? 9 : -9 }
+                guard await pause(0.08) else { return }
+            }
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) { rot = 0 }
+        case .hop:
+            withAnimation(.easeOut(duration: 0.15)) { hop = -22 }
+            guard await pause(0.16) else { return }
+            withAnimation(.interpolatingSpring(stiffness: 220, damping: 9)) { hop = 0 }
+        case .dance:
+            for i in 0..<8 {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    rot = i % 2 == 0 ? 10 : -10
+                    hop = i % 2 == 0 ? -10 : 0
+                }
+                guard await pause(0.22) else { return }
+            }
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) { rot = 0; hop = 0 }
+        case .spin:
+            withAnimation(.easeInOut(duration: 0.8)) { turn += 360 }
+            withAnimation(.easeOut(duration: 0.2)) { hop = -16 }
+            guard await pause(0.4) else { return }
+            withAnimation(.interpolatingSpring(stiffness: 220, damping: 9)) { hop = 0 }
+        case .calm:
+            withAnimation(.easeOut(duration: 0.14)) { hop = -8 }
+            guard await pause(0.15) else { return }
+            withAnimation(.interpolatingSpring(stiffness: 220, damping: 10)) { hop = 0 }
+        }
+
+        guard await pause(max(1.8, Double(m.text.count) * 0.055)) else { return }
+        pose = nil
+        onPhrase(nil)
     }
 }
