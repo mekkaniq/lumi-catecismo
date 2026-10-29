@@ -8,6 +8,8 @@ on:
     types: [completed]
     branches: [main]
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   release:
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
@@ -86,3 +88,14 @@ jobs:
             -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" \
             -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER_ID" \
             | tail -40
+      - name: Registrar o resultado
+        if: always()
+        run: |
+          mkdir -p /tmp/st && cd /tmp/st
+          echo "sha=$SHA status=${{ job.status }} skipped=${{ steps.guard.outputs.skip }} run=${{ github.run_number }} time=$(date -u +%FT%TZ)" > release-status.txt
+          git init -q -b ci-status
+          git config user.name "lumi-ci"
+          git config user.email "ci@users.noreply.github.com"
+          git add -A
+          git commit -q -m "release status [skip ci]"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" ci-status
