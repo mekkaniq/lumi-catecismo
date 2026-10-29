@@ -1,0 +1,3 @@
+** BUILD SUCCEEDED **
+/Users/runner/work/lumi-catecismo/lumi-catecismo/ios/Sources/UI/Components.swift:239:1: warning: extension declares a conformance of imported type 'UINavigationController' to imported protocol 'UIGestureRecognizerDelegate'; this will not behave correctly if the owners of 'UIKit' introduce this conformance in the future
+2026-10-29 02:07:45.291 appintentsmetadataprocessor[4980:19083] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
