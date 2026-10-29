@@ -34,14 +34,14 @@ jobs:
       - name: Publicar capturas e log
         if: always()
         run: |
-          mkdir -p /tmp/out
+          mkdir -p /tmp/out /tmp/pub
           cp -r shots /tmp/out/ 2>/dev/null || true
           grep -E "error:|warning:|BUILD " build.log | sort -u | head -200 > /tmp/out/build-errors.txt || true
+          cp -r /tmp/out/* /tmp/pub/
+          cd /tmp/pub
+          git init -q -b ci-shots
           git config user.name "lumi-ci"
           git config user.email "ci@users.noreply.github.com"
-          git checkout --orphan ci-shots
-          git rm -rf . -q || true
-          cp -r /tmp/out/* .
           git add -A
           git commit -q -m "CI: capturas e log [skip ci]"
-          git push -f origin ci-shots
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" ci-shots

@@ -62,7 +62,7 @@ extension View {
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(theme.deep, for: .navigationBar)
-            .toolbarBackground(solid ? Visibility.visible : Visibility.automatic, for: .navigationBar)
+            .toolbarBackground(Visibility.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar { ToolbarItem(placement: .topBarTrailing) { FontSizeButton() } }
     }
@@ -102,9 +102,9 @@ struct FlamesRow: View {
     var body: some View {
         HStack(spacing: 2) {
             ForEach(0..<3, id: \.self) { i in
-                FlameShape()
-                    .fill(i < stars ? Pal.gold : Pal.line)
-                    .frame(width: 11, height: 14)
+                Image(systemName: "flame.fill")
+                    .font(.system(size: 13))
+                    .foregroundStyle(i < stars ? Pal.gold : Pal.line)
             }
         }
         .accessibilityElement()
@@ -295,9 +295,9 @@ struct Confetti: View {
                 ForEach(sparks) { p in
                     let u = (t - p.delay) / p.dur
                     if u > 0 && u < 1 {
-                        FlameShape()
-                            .fill(Pal.gold)
-                            .frame(width: 14, height: 18)
+                        Image(systemName: "flame.fill")
+                            .font(.system(size: 20))
+                            .foregroundStyle(Pal.gold)
                             .rotationEffect(.degrees(p.rot + u * 180))
                             .position(x: p.x * g.size.width + p.dx * u, y: -20 + u * (g.size.height + 40))
                             .opacity(1 - max(0, (u - 0.75) * 4))
@@ -315,8 +315,11 @@ struct HeroBackground: View {
     let theme: Theme
     var body: some View {
         GlowBackground(theme: theme)
+            .overlay(alignment: .top) {
+                LinearGradient(colors: [theme.deep, theme.deep.opacity(0)], startPoint: .top, endPoint: .bottom)
+                    .frame(height: 70)
+            }
             .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 34, bottomTrailingRadius: 34, style: .continuous))
             .shadow(color: .black.opacity(0.3), radius: 18, y: 10)
-            .ignoresSafeArea(edges: .top)
     }
 }

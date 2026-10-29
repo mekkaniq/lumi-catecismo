@@ -85,7 +85,7 @@ struct BooksScene: View {
     var open: (String) -> Void
 
     private let ox: CGFloat = 0
-    private let oy: CGFloat = 40
+    private let oy: CGFloat = 30
 
     var body: some View {
         GeometryReader { geo in
@@ -116,7 +116,7 @@ struct BooksScene: View {
                     .position(x: 70 * s, y: (92 + oy) * s)
             }
         }
-        .aspectRatio(330.0 / 240.0, contentMode: .fit)
+        .aspectRatio(330.0 / 222.0, contentMode: .fit)
     }
 
     private func bookH(_ id: String, x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat, label: String, left: Bool, s: CGFloat) -> some View {
