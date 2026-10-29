@@ -96,9 +96,10 @@ final class Game: ObservableObject {
         setup()
     }
 
-    var current: (n: Int, mode: PlayMode) { items[i] }
-    var item: Item { book.item(items[i].n) }
-    var isConfQuiz: Bool { book.isConf && items[i].mode == .quiz }
+    private var safeI: Int { min(max(i, 0), max(items.count - 1, 0)) }
+    var current: (n: Int, mode: PlayMode) { items[safeI] }
+    var item: Item { book.item(items[safeI].n) }
+    var isConfQuiz: Bool { book.isConf && items[safeI].mode == .quiz }
 
     func shown(_ m: LumiMood) -> LumiMood { (book.isConf && m == .cheer) ? .happy : m }
 
@@ -247,6 +248,12 @@ final class Game: ObservableObject {
     }
 
     /// Só para as capturas de tela do CI.
+    /// Só para o CI: pula para o último item (testa o fim da lição).
+    func debugJumpToLast() {
+        i = max(items.count - 1, 0)
+        setup()
+    }
+
     func debugAnswer(right: Bool) {
         switch items[i].mode {
         case .quiz:
@@ -258,12 +265,15 @@ final class Game: ObservableObject {
         }
     }
 
+    /// No último item não avança o índice: só sinaliza o fim, e a tela abre o resultado.
+    /// (Avançar além do fim fazia a tela tentar desenhar um item inexistente e o app fechava.)
     func next() {
-        i += 1
-        if i >= items.count {
+        guard !finished else { return }
+        if i + 1 >= items.count {
             finished = true
             return
         }
+        i += 1
         setup()
     }
 

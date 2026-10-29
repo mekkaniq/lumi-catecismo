@@ -93,6 +93,18 @@ final class Store: ObservableObject {
 
     // MARK: tamanho da letra
     func cycleFont() { d.fs = (d.fs + 1) % 3; save() }
+    func setFont(_ v: Int) { d.fs = min(max(v, 0), 2); save() }
+
+    // MARK: apagar progresso (Ajustes)
+    func resetProgress() {
+        d.books = [:]
+        d.days = []
+        d.lastDay = nil
+        d.lastBook = nil
+        d.scoreA = 0
+        d.scoreB = 0
+        save()
+    }
 
     // MARK: demonstração (usada só nas capturas de tela do CI)
     func seedDemo() {

@@ -24,11 +24,13 @@ struct HubView: View {
         }
         .background(Pal.bg.ignoresSafeArea())
         .environment(\.theme, theme)
-        .lumiBar(theme, solid: false)
+        .heroScreen(theme)
     }
 
     private func hero(_ line: (mood: LumiMood, text: String)) -> some View {
         VStack(alignment: .leading, spacing: 10) {
+            HeroTopBar(showBack: false)
+                .padding(.bottom, 2)
             Text("WESTMINSTER · EM JOGOS")
                 .font(.caption.weight(.semibold))
                 .tracking(2.4)
@@ -43,7 +45,7 @@ struct HubView: View {
             Bubble { Text(md(line.text)) }
         }
         .padding(.horizontal, 20)
-        .padding(.top, 6)
+        .padding(.top, 2)
         .padding(.bottom, 28)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background { HeroBackground(theme: theme) }

@@ -39,10 +39,13 @@ shot complete -shot complete -demo
 shot build -shot build -demo
 shot conf-quiz -shot quiz -book conf -demo -answer wrong
 shot result -shot result -demo
+shot finish -shot lastq -demo
+shot settings -shot hub -demo -settings
 shot class -shot class -demo
 shot text -shot text -demo
 xcrun simctl ui "$UDID" appearance dark
 shot dark-hub -shot hub -demo
 shot dark-book -shot book -book maior -demo
 shot dark-quiz -shot quiz -demo -answer right
+shot dark-settings -shot hub -demo -settings
 echo "Capturas:"; ls shots

@@ -27,7 +27,7 @@ struct BookView: View {
         }
         .background(Pal.bg.ignoresSafeArea())
         .environment(\.theme, theme)
-        .lumiBar(theme, solid: false)
+        .heroScreen(theme)
     }
 
     // MARK: topo
@@ -40,6 +40,8 @@ struct BookView: View {
             return line.mood
         }()
         return VStack(alignment: .leading, spacing: 12) {
+            HeroTopBar(showBack: true)
+                .padding(.bottom, 2)
             Text(book.tag.uppercased())
                 .font(.caption.weight(.semibold))
                 .tracking(2)
@@ -76,7 +78,7 @@ struct BookView: View {
             ProgressBar(value: Double(p) / 100, tint: Pal.brightGold, height: 7, track: .white.opacity(0.18))
         }
         .padding(.horizontal, 20)
-        .padding(.top, 6)
+        .padding(.top, 2)
         .padding(.bottom, 26)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background { HeroBackground(theme: theme) }

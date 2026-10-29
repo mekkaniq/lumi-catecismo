@@ -74,6 +74,17 @@ final class Nav: ObservableObject {
             g.ok = 7
             game = g
             path.append(.result)
+        case "lastq":
+            path = [.book(id), .unit(id, 0)]
+            let g = Game(book: b, pool: b.nums(0), mode: .quiz, back: .unit, store: store)
+            g.debugJumpToLast()
+            g.debugAnswer(right: true)
+            game = g
+            path.append(.game)
+            Task { @MainActor [weak g] in
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+                g?.next()
+            }
         case "class": path = [.book(id), .classroom(id, 0, 0)]
         case "text": path = [.text("mand")]
         default: break

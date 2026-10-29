@@ -27,6 +27,8 @@ targets:
         CFBundleLocalizations: [pt-BR]
         LSRequiresIPhoneOS: true
         ITSAppUsesNonExemptEncryption: false
+        UIStatusBarStyle: UIStatusBarStyleLightContent
+        UIViewControllerBasedStatusBarAppearance: false
         UILaunchScreen:
           UIColorName: LaunchBG
           UIImageName: LaunchLumi

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // MARK: - estilos de botão e cartão
 
@@ -75,7 +76,7 @@ struct CardModifier: ViewModifier {
 extension View {
     func card(radius: CGFloat = 20) -> some View { modifier(CardModifier(radius: radius)) }
 
-    /// Barra de navegação na cor do livro, com botão de tamanho da letra.
+    /// Barra de navegação na cor do livro (telas internas: estudo, jogo, resultado...).
     func lumiBar(_ theme: Theme, solid: Bool, title: String = "") -> some View {
         self
             .navigationTitle(title)
@@ -83,20 +84,165 @@ extension View {
             .toolbarBackground(theme.deep, for: .navigationBar)
             .toolbarBackground(Visibility.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar { ToolbarItem(placement: .topBarTrailing) { FontSizeButton() } }
+    }
+
+    /// Telas com capa colorida (início e livros): sem barra fixa; a capa rola junto com o conteúdo.
+    /// Fica só uma sombra suave atrás do relógio, para ele continuar legível quando a lista passa por baixo.
+    func heroScreen(_ theme: Theme) -> some View {
+        self
+            .toolbar(.hidden, for: .navigationBar)
+            .navigationTitle("")
+            .overlay(alignment: .top) {
+                LinearGradient(stops: [
+                    .init(color: theme.deep.opacity(0.92), location: 0),
+                    .init(color: theme.deep.opacity(0.6), location: 0.6),
+                    .init(color: theme.deep.opacity(0), location: 1),
+                ], startPoint: .top, endPoint: .bottom)
+                .frame(height: 14)
+                .ignoresSafeArea(edges: .top)
+                .allowsHitTesting(false)
+            }
     }
 }
 
-struct FontSizeButton: View {
-    @EnvironmentObject private var store: Store
+/// Linha de botões no topo da capa: voltar (opcional) e Ajustes. Rola junto com a capa.
+struct HeroTopBar: View {
+    var showBack = false
+    @EnvironmentObject private var nav: Nav
+
     var body: some View {
-        Button { store.cycleFont() } label: {
-            HStack(alignment: .lastTextBaseline, spacing: 0) {
-                Text("A").font(.footnote.bold())
-                Text("A").font(.title3.bold())
+        HStack {
+            if showBack {
+                Button { nav.pop() } label: { Image(systemName: "chevron.backward") }
+                    .buttonStyle(GlassCircleStyle())
+                    .accessibilityLabel("Voltar")
+            }
+            Spacer()
+            SettingsButton()
+        }
+    }
+}
+
+struct GlassCircleStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 17, weight: .semibold))
+            .foregroundStyle(.white)
+            .frame(width: 42, height: 42)
+            .background(.white.opacity(configuration.isPressed ? 0.26 : 0.14), in: Circle())
+            .overlay(Circle().stroke(.white.opacity(0.22), lineWidth: 1))
+            .scaleEffect(configuration.isPressed ? 0.92 : 1)
+            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: configuration.isPressed)
+    }
+}
+
+struct SettingsButton: View {
+    @EnvironmentObject private var store: Store
+    @State private var open = false
+    var body: some View {
+        Button { open = true } label: { Image(systemName: "gearshape.fill") }
+            .buttonStyle(GlassCircleStyle())
+            .accessibilityLabel("Ajustes")
+            .onAppear {
+                if ProcessInfo.processInfo.arguments.contains("-settings") { open = true }
+            }
+            .sheet(isPresented: $open) {
+                SettingsView()
+                    .environmentObject(store)
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
+            }
+    }
+}
+
+/// Ajustes: tamanho da letra, voz da Lumi, apagar progresso e sobre.
+struct SettingsView: View {
+    @EnvironmentObject private var store: Store
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var systemSize
+    @AppStorage("lumiVoice") private var voice = true
+    @State private var confirmReset = false
+
+    private func size(_ fs: Int) -> DynamicTypeSize {
+        let all = DynamicTypeSize.allCases
+        let idx = all.firstIndex(of: systemSize) ?? 3
+        let cap = all.firstIndex(of: .accessibility3) ?? (all.count - 1)
+        return all[min(idx + fs * 2, cap)]
+    }
+
+    private var version: String {
+        let v = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+        let b = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? ""
+        return b.isEmpty ? v : "\(v) (\(b))"
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    Picker("Tamanho da letra", selection: Binding(get: { store.d.fs }, set: { store.setFont($0) })) {
+                        Text("Normal").tag(0)
+                        Text("Grande").tag(1)
+                        Text("Maior").tag(2)
+                    }
+                    .pickerStyle(.segmented)
+                    Text("Qual é o fim principal do homem?")
+                        .font(.system(.title3, design: .serif).weight(.semibold))
+                        .dynamicTypeSize(size(store.d.fs))
+                        .fixedSize(horizontal: false, vertical: true)
+                        .animation(.easeInOut(duration: 0.2), value: store.d.fs)
+                } header: {
+                    Text("Tamanho da letra")
+                } footer: {
+                    Text("Vale para o app todo, inclusive o Modo Classe.")
+                }
+
+                Section {
+                    Toggle("Lumi fala quando é tocada", isOn: $voice)
+                } header: {
+                    Text("Voz")
+                } footer: {
+                    Text("A leitura das perguntas pelo botão Ouvir continua funcionando.")
+                }
+
+                Section {
+                    Button("Apagar meu progresso", role: .destructive) { confirmReset = true }
+                } footer: {
+                    Text("Zera as chamas, os dias de estudo e o placar deste aparelho.")
+                }
+
+                Section {
+                    LabeledContent("Versão", value: version)
+                    LabeledContent("Textos", value: "Padrões de Westminster")
+                    LabeledContent("Internet", value: "Não precisa")
+                } header: {
+                    Text("Sobre")
+                }
+            }
+            .navigationTitle("Ajustes")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) { Button("OK") { dismiss() } }
+            }
+            .confirmationDialog("Apagar todo o progresso deste aparelho?", isPresented: $confirmReset, titleVisibility: .visible) {
+                Button("Apagar", role: .destructive) { store.resetProgress(); Haptics.miss() }
+                Button("Cancelar", role: .cancel) {}
+            } message: {
+                Text("Isso não pode ser desfeito.")
             }
         }
-        .accessibilityLabel("Tamanho da letra. Toque para mudar")
+        .tint(Pal.gold)
+    }
+}
+
+/// Mantém o gesto de deslizar da borda para voltar mesmo nas telas sem barra.
+extension UINavigationController: UIGestureRecognizerDelegate {
+    override open func viewDidLoad() {
+        super.viewDidLoad()
+        interactivePopGestureRecognizer?.delegate = self
+    }
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        viewControllers.count > 1
     }
 }
 
@@ -329,16 +475,22 @@ struct Confetti: View {
     }
 }
 
-/// Faixa colorida do topo das telas internas (título e Lumi).
+/// Capa colorida do início e dos livros. A cor continua para cima (atrás do relógio e no puxão da rolagem).
 struct HeroBackground: View {
     let theme: Theme
     var body: some View {
         GlowBackground(theme: theme)
             .overlay(alignment: .top) {
                 LinearGradient(colors: [theme.deep, theme.deep.opacity(0)], startPoint: .top, endPoint: .bottom)
-                    .frame(height: 70)
+                    .frame(height: 110)
             }
             .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 34, bottomTrailingRadius: 34, style: .continuous))
-            .shadow(color: .black.opacity(0.3), radius: 18, y: 10)
+            .background(alignment: .top) {
+                theme.deep
+                    .frame(height: 1200)
+                    .offset(y: -1199)
+            }
+        .shadow(color: .black.opacity(0.3), radius: 18, y: 10)
+        .accessibilityHidden(true)
     }
 }
