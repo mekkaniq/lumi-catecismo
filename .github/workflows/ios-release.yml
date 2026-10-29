@@ -1,0 +1,62 @@
+name: iOS release (TestFlight)
+# Gera o app assinado e envia para o App Store Connect (TestFlight).
+# Roda só quando você pedir: aba Actions > "iOS release (TestFlight)" > Run workflow.
+on:
+  workflow_dispatch:
+jobs:
+  release:
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Conferir segredos
+        run: |
+          for v in TEAM_ID KEY_ID ISSUER_ID; do
+            if [ -z "${!v}" ]; then echo "Falta o segredo para $v"; exit 1; fi
+          done
+          if [ -z "${{ secrets.ASC_KEY_P8 }}" ]; then echo "Falta o segredo ASC_KEY_P8"; exit 1; fi
+      - name: Instalar XcodeGen e gerar o projeto
+        working-directory: ios
+        run: |
+          brew install xcodegen
+          xcodegen generate
+      - name: Chave da API do App Store Connect
+        run: |
+          echo "${{ secrets.ASC_KEY_P8 }}" > "$RUNNER_TEMP/AuthKey.p8"
+      - name: Arquivar (assinatura automática)
+        working-directory: ios
+        run: |
+          set -o pipefail
+          xcodebuild archive \
+            -project LumiCatecismos.xcodeproj -scheme LumiCatecismos \
+            -configuration Release -destination 'generic/platform=iOS' \
+            -archivePath build/Lumi.xcarchive \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" \
+            -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER_ID" \
+            DEVELOPMENT_TEAM="$TEAM_ID" CURRENT_PROJECT_VERSION="${{ github.run_number }}" \
+            | tail -40
+      - name: Exportar e enviar ao TestFlight
+        working-directory: ios
+        run: |
+          cat > build/ExportOptions.plist <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>${TEAM_ID}</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>uploadSymbols</key><true/>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive -archivePath build/Lumi.xcarchive \
+            -exportOptionsPlist build/ExportOptions.plist -exportPath build/export \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" \
+            -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER_ID" \
+            | tail -40
