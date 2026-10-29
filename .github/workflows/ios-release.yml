@@ -27,9 +27,10 @@ jobs:
       - name: Só o commit mais recente
         id: guard
         run: |
-          git fetch -q origin main
-          if [ "${{ github.event_name }}" = "workflow_run" ] && [ "$(git rev-parse origin/main)" != "$SHA" ]; then
-            echo "Há um commit mais novo; este envio é dispensado."
+          git fetch -q --depth=100 origin main
+          NEWER=$(git log --format=%h "$SHA..origin/main" -- ios .github/workflows/ios.yml 2>/dev/null | head -1)
+          if [ "${{ github.event_name }}" = "workflow_run" ] && [ -n "$NEWER" ]; then
+            echo "Há um commit mais novo no app ($NEWER); este envio é dispensado."
             echo "skip=true" >> "$GITHUB_OUTPUT"
           fi
       - name: Selecionar o Xcode 26
