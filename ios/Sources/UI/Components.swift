@@ -42,6 +42,25 @@ struct PillStyle: ButtonStyle {
     }
 }
 
+/// Botão redondo só com ícone (usado nos controles do Modo Classe).
+struct IconPillStyle: ButtonStyle {
+    var solid = false
+    @Environment(\.theme) private var theme
+    @Environment(\.isEnabled) private var enabled
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.body.weight(.semibold))
+            .foregroundStyle(solid ? Color.white : Pal.fg)
+            .frame(width: 46, height: 46)
+            .background(solid ? AnyShapeStyle(theme.primary) : AnyShapeStyle(Pal.surface), in: Circle())
+            .overlay(Circle().stroke(solid ? Color.clear : Pal.line, lineWidth: 1))
+            .opacity(enabled ? 1 : 0.4)
+            .scaleEffect(configuration.isPressed ? 0.92 : 1)
+            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: configuration.isPressed)
+    }
+}
+
 struct CardModifier: ViewModifier {
     @Environment(\.colorScheme) private var scheme
     var radius: CGFloat = 20

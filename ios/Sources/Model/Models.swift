@@ -28,6 +28,7 @@ struct Book: Codable, Identifiable, Hashable {
     let units: [Unit]
 
     var isConf: Bool { id == "conf" }
+    var short: String { id == "breve" ? "Breve" : id == "maior" ? "Maior" : "Confissão" }
     var itemWord: String { isConf ? "Seção" : "Pergunta" }
     var unitWord: String { isConf ? "Capítulo" : "Lição" }
     var all: [Int] { Array(1...items.count) }
