@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 jobs:
   release:
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 60
     env:
       TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -13,6 +13,11 @@ jobs:
       ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
     steps:
       - uses: actions/checkout@v4
+      - name: Selecionar o Xcode 26
+        run: |
+          XC=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1)
+          sudo xcode-select -s "$XC"
+          xcodebuild -version
       - name: Conferir segredos
         run: |
           for v in TEAM_ID KEY_ID ISSUER_ID; do

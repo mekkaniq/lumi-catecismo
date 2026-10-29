@@ -5,7 +5,7 @@ APP=$(find ios/build/Build/Products -name "LumiCatecismos.app" -maxdepth 3 | hea
 UDID=$(xcrun simctl list devices available -j | python3 -c "
 import json,sys
 d=json.load(sys.stdin)['devices']
-want=['iPhone 16 Pro','iPhone 15 Pro','iPhone 16','iPhone 15']
+want=['iPhone 17 Pro','iPhone 16 Pro','iPhone 15 Pro','iPhone 16','iPhone 15']
 c=[x for k,v in d.items() if 'iOS' in k for x in v]
 for w in want:
     for x in c:
