@@ -1,0 +1,47 @@
+name: iOS build
+on:
+  push:
+    branches: [main]
+    paths: ['ios/**', '.github/workflows/ios.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Versão do Xcode
+        run: xcodebuild -version
+      - name: Instalar XcodeGen
+        run: brew install xcodegen
+      - name: Gerar o projeto
+        working-directory: ios
+        run: xcodegen generate
+      - name: Compilar
+        working-directory: ios
+        run: |
+          set +e
+          xcodebuild -project LumiCatecismos.xcodeproj -scheme LumiCatecismos \
+            -sdk iphonesimulator -configuration Debug -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO build > ../build.log 2>&1
+          status=$?
+          grep -E "error:|BUILD (SUCCEEDED|FAILED)" ../build.log | sort -u | head -60
+          exit $status
+      - name: Simulador e capturas de tela
+        run: bash ios/ci/shots.sh
+      - name: Publicar capturas e log
+        if: always()
+        run: |
+          mkdir -p /tmp/out
+          cp -r shots /tmp/out/ 2>/dev/null || true
+          grep -E "error:|warning:|BUILD " build.log | sort -u | head -200 > /tmp/out/build-errors.txt || true
+          git config user.name "lumi-ci"
+          git config user.email "ci@users.noreply.github.com"
+          git checkout --orphan ci-shots
+          git rm -rf . -q || true
+          cp -r /tmp/out/* .
+          git add -A
+          git commit -q -m "CI: capturas e log [skip ci]"
+          git push -f origin ci-shots
