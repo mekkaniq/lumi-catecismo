@@ -32,9 +32,9 @@ struct HubView: View {
             HeroTopBar(showBack: false)
                 .padding(.bottom, 2)
             HStack(spacing: 8) {
-                Image(systemName: "cross.fill")
-                    .font(.footnote)
-                    .foregroundStyle(Pal.brightGold)
+                LatinCross()
+                    .fill(Pal.brightGold)
+                    .frame(width: 10, height: 15)
                     .shadow(color: Pal.brightGold.opacity(0.6), radius: 6)
                     .accessibilityHidden(true)
                 Text("WESTMINSTER · EM JOGOS")
@@ -229,5 +229,19 @@ struct ToolTile: View {
                     .shadow(color: .black.opacity(0.06), radius: 12, y: 6)
             }
         }
+    }
+}
+
+/// Cruz latina simples (haste longa embaixo), em ouro.
+struct LatinCross: Shape {
+    func path(in r: CGRect) -> Path {
+        let w = r.width, h = r.height
+        let t = w * 0.34          // espessura dos braços
+        let x = (w - t) / 2
+        let armY = h * 0.26
+        var p = Path()
+        p.addRect(CGRect(x: r.minX + x, y: r.minY, width: t, height: h))
+        p.addRect(CGRect(x: r.minX, y: r.minY + armY, width: w, height: t))
+        return p
     }
 }
