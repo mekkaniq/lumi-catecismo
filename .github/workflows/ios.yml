@@ -1,7 +1,7 @@
 name: iOS build
 on:
   push:
-    branches: [main]
+    branches: [main, app-verso-vivo]
     paths: ['ios/**', '.github/workflows/ios.yml']
   workflow_dispatch:
 permissions:

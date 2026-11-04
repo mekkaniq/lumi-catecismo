@@ -32,7 +32,7 @@ private struct GameBody: View {
             .padding(.bottom, g.done ? 12 : 40)
         }
         .scrollDismissesKeyboard(.immediately)
-        .background(Pal.bg.ignoresSafeArea())
+        .background(Backdrop())
         .environment(\.theme, theme)
         .lumiBar(theme, solid: true, title: "\(g.mode.title) · \(g.i + 1)/\(g.items.count)")
         .safeAreaInset(edge: .bottom, spacing: 0) {

@@ -66,7 +66,7 @@ struct TextScreen: View {
                 .padding(.vertical, 18)
             }
         }
-        .background(Pal.bg.ignoresSafeArea())
+        .background(Backdrop())
         .environment(\.theme, theme)
         .lumiBar(theme, solid: true, title: t?.t ?? "")
         .onDisappear { Speaker.shared.stop() }

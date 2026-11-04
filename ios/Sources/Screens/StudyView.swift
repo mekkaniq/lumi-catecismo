@@ -97,7 +97,7 @@ struct StudyView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 18)
         }
-        .background(Pal.bg.ignoresSafeArea())
+        .background(Backdrop())
         .environment(\.theme, theme)
         .lumiBar(theme, solid: true, title: "\(idx + 1) de \(list.count)")
         .onAppear {

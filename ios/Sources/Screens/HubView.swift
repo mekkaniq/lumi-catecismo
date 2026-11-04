@@ -22,7 +22,7 @@ struct HubView: View {
                 .padding(.bottom, 44)
             }
         }
-        .background(Pal.bg.ignoresSafeArea())
+        .background(Backdrop())
         .environment(\.theme, theme)
         .heroScreen(theme)
     }
@@ -35,7 +35,7 @@ struct HubView: View {
                 .font(.caption.weight(.semibold))
                 .tracking(2.4)
                 .foregroundStyle(Pal.brightGold)
-            RollingTitle("Lumi Catecismos", font: .display(.largeTitle))
+            RollingTitle("Catecismos Verso Vivo", font: .display(.largeTitle))
             Text("O Breve Catecismo, o Catecismo Maior e a Confissão de Fé, para aprender em casa e ensinar na igreja.")
                 .font(.callout)
                 .foregroundStyle(.white.opacity(0.86))
@@ -146,8 +146,12 @@ struct HubView: View {
                 .font(.footnote)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Pal.muted)
-            Text("Lumi Catecismos · Padrões de Westminster")
+            Text("Catecismos Verso Vivo · Padrões de Westminster")
                 .font(.system(.footnote, design: .serif).italic())
+                .foregroundStyle(Pal.gold)
+            Link("Feito por Eduardo de Souza", destination: URL(string: "https://instagram.com/yesdudu")!)
+                .font(.display(.caption2))
+                .tracking(1)
                 .foregroundStyle(Pal.gold)
         }
         .frame(maxWidth: .infinity)
@@ -190,27 +194,27 @@ struct ToolTile: View {
         HStack(spacing: 14) {
             Image(systemName: icon)
                 .font(.title3.weight(.semibold))
-                .foregroundStyle(primary ? .white : theme.accent)
+                .foregroundStyle(primary ? Pal.ink : theme.accent)
                 .frame(width: 44, height: 44)
-                .background(primary ? AnyShapeStyle(.white.opacity(0.18)) : AnyShapeStyle(theme.soft), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .background(primary ? AnyShapeStyle(Pal.ink.opacity(0.12)) : AnyShapeStyle(theme.soft), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.headline).foregroundStyle(primary ? .white : Pal.fg)
+                Text(title).font(.headline).foregroundStyle(primary ? Pal.ink : Pal.fg)
                 Text(subtitle)
                     .font(.footnote)
-                    .foregroundStyle(primary ? .white.opacity(0.85) : Pal.muted)
+                    .foregroundStyle(primary ? Pal.ink.opacity(0.8) : Pal.muted)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             Image(systemName: "chevron.right")
                 .font(.footnote.weight(.semibold))
-                .foregroundStyle(primary ? .white.opacity(0.7) : Pal.muted)
+                .foregroundStyle(primary ? Pal.ink.opacity(0.7) : Pal.muted)
         }
         .padding(14)
         .background {
             if primary {
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(LinearGradient(colors: [theme.primary.opacity(0.88), theme.primary], startPoint: .top, endPoint: .bottom))
-                    .shadow(color: theme.primary.opacity(0.4), radius: 14, y: 8)
+                    .fill(LinearGradient(colors: [Color(hex: 0xf6d98e), Color(hex: 0xd8a94a)], startPoint: .top, endPoint: .bottom))
+                    .shadow(color: Color(hex: 0xd8a94a).opacity(0.4), radius: 14, y: 8)
             } else {
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                     .fill(Pal.surface)

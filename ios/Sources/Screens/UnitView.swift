@@ -19,7 +19,7 @@ struct UnitView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 18)
         }
-        .background(Pal.bg.ignoresSafeArea())
+        .background(Backdrop())
         .environment(\.theme, theme)
         .lumiBar(theme, solid: true, title: "\(book.unitWord) \(book.unitNum(u))")
         .onAppear { store.setLast(book.id, u) }

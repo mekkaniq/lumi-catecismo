@@ -23,7 +23,7 @@ final class Speaker {
         synth.speak(u)
     }
 
-    /// Falinhas da Lumi: voz mais aguda e respeitando o botão de silencioso do iPhone.
+    /// Falinhas da Nine: voz mais aguda e respeitando o botão de silencioso do iPhone.
     func chatter(_ text: String) {
         guard UserDefaults.standard.object(forKey: "lumiVoice") as? Bool ?? true else { return }
         try? AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)

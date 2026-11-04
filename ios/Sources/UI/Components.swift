@@ -32,12 +32,12 @@ struct PillStyle: ButtonStyle {
             .animation(.spring(response: 0.25, dampingFraction: 0.7), value: configuration.isPressed)
     }
 
-    private var fg: Color { kind == .gold ? Color(hex: 0x1a1405) : kind == .solid ? .white : Pal.fg }
-    private var shadowColor: Color { kind == .gold ? Pal.gold : theme.primary }
+    private var fg: Color { kind == .gold || kind == .solid ? Color(hex: 0x1c140a) : Pal.fg }
+    private var shadowColor: Color { Color(hex: 0xd8a94a) }
     private var bg: AnyShapeStyle {
         switch kind {
-        case .solid: return AnyShapeStyle(LinearGradient(colors: [theme.primary.opacity(0.85), theme.primary], startPoint: .top, endPoint: .bottom))
-        case .gold: return AnyShapeStyle(LinearGradient(colors: [Pal.gold.opacity(0.85), Pal.gold], startPoint: .top, endPoint: .bottom))
+        case .solid: return AnyShapeStyle(LinearGradient(colors: [Color(hex: 0xf6d98e), Color(hex: 0xd8a94a)], startPoint: .top, endPoint: .bottom))
+        case .gold: return AnyShapeStyle(LinearGradient(colors: [Color(hex: 0xf6d98e), Color(hex: 0xd8a94a)], startPoint: .top, endPoint: .bottom))
         case .plain: return AnyShapeStyle(Pal.surface)
         }
     }
@@ -52,9 +52,9 @@ struct IconPillStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.body.weight(.semibold))
-            .foregroundStyle(solid ? Color.white : Pal.fg)
+            .foregroundStyle(solid ? Color(hex: 0x1c140a) : Pal.fg)
             .frame(width: 46, height: 46)
-            .background(solid ? AnyShapeStyle(theme.primary) : AnyShapeStyle(Pal.surface), in: Circle())
+            .background(solid ? AnyShapeStyle(Color(hex: 0xd8a94a)) : AnyShapeStyle(Pal.surface), in: Circle())
             .overlay(Circle().stroke(solid ? Color.clear : Pal.line, lineWidth: 1))
             .opacity(enabled ? 1 : 0.4)
             .scaleEffect(configuration.isPressed ? 0.92 : 1)
@@ -155,7 +155,7 @@ struct SettingsButton: View {
     }
 }
 
-/// Ajustes: tamanho da letra, voz da Lumi, apagar progresso e sobre.
+/// Ajustes: tamanho da letra, voz da Nine, apagar progresso e sobre.
 struct SettingsView: View {
     @EnvironmentObject private var store: Store
     @Environment(\.dismiss) private var dismiss
@@ -198,7 +198,7 @@ struct SettingsView: View {
                 }
 
                 Section {
-                    Toggle("Lumi fala quando é tocada", isOn: $voice)
+                    Toggle("Nine fala quando é tocada", isOn: $voice)
                 } header: {
                     Text("Voz")
                 } footer: {
@@ -323,13 +323,13 @@ struct Triangle: Shape {
     }
 }
 
-/// Balão de fala da Lumi.
+/// Balão de fala da Nine.
 struct Bubble<Content: View>: View {
     @ViewBuilder var content: Content
     var body: some View {
         content
             .font(.callout)
-            .foregroundStyle(Pal.fg)
+            .foregroundStyle(Pal.ink)
             .padding(.horizontal, 16)
             .padding(.vertical, 13)
             .frame(maxWidth: .infinity, alignment: .leading)
