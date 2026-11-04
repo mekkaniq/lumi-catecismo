@@ -34,7 +34,6 @@ struct BookView: View {
     private func hero(_ line: (mood: LumiMood, text: String)) -> some View {
         let p = store.pctOf(book)
         let learned = store.learned(book)
-        let days = store.daysCount
         let mood: LumiMood = {
             if let n = poke { _ = n; return pokeRev ? (book.isConf ? .happy : .cheer) : .think }
             return line.mood
@@ -73,7 +72,6 @@ struct BookView: View {
             HStack(spacing: 8) {
                 StatChip(value: "\(p)%", label: "do livro")
                 StatChip(value: "\(learned)", label: "de \(book.items.count) praticad\(book.isConf ? "as" : "as")")
-                StatChip(value: "\(days)", label: days == 1 ? "dia de estudo" : "dias de estudo")
             }
             ProgressBar(value: Double(p) / 100, tint: Pal.brightGold, height: 7, track: .white.opacity(0.18))
         }
