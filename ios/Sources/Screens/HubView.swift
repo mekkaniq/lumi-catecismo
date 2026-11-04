@@ -20,6 +20,7 @@ struct HubView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 26)
                 .padding(.bottom, 44)
+                .readable()
             }
         }
         .background(Backdrop())
@@ -54,7 +55,8 @@ struct HubView: View {
         .padding(.horizontal, 20)
         .padding(.top, 2)
         .padding(.bottom, 28)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: 760, alignment: .leading)
+        .frame(maxWidth: .infinity)
         .background { HeroBackground(theme: theme) }
     }
 

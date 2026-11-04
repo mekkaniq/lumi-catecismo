@@ -117,7 +117,6 @@ function booksScene(){
       <rect x="292" y="86" width="30" height="94" rx="4" fill="${BOOKS.breve.color}"/>
       <rect x="292" y="95" width="30" height="2.4" fill="#e0ad4a"/><rect x="292" y="168" width="30" height="2.4" fill="#e0ad4a"/>
       <text transform="rotate(-90 307 133)" x="307" y="136.5" text-anchor="middle" fill="#f6ecd6" font-size="9.5" font-weight="700" letter-spacing="1.2" font-family="var(--f-display)">BREVE</text></g>
-    <g class="page"><path d="M40 168c10-8 22-8 32 0-10-3-22-3-32 0z" fill="#f6ecd6"/><path d="M40 168v-2c10-7 22-7 32 0v2" fill="none" stroke="#e0ad4a" stroke-width="1"/></g>
     <g class="nine-on-books">${nineSVG('happy',150,24,100)}</g>
     <g class="notes" fill="#e0ad4a"><path d="M262 40l1.4 3 3 1.4-3 1.4-1.4 3-1.4-3-3-1.4 3-1.4z"/><path d="M84 92l1 2.2 2.2 1-2.2 1-1 2.2-1-2.2-2.2-1 2.2-1z"/></g>
   </svg>`;

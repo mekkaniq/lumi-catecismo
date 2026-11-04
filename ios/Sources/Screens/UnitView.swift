@@ -18,6 +18,7 @@ struct UnitView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 18)
+            .readable()
         }
         .background(Backdrop())
         .environment(\.theme, theme)

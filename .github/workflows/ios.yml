@@ -34,6 +34,10 @@ jobs:
           exit $status
       - name: Simulador e capturas de tela
         run: bash ios/ci/shots.sh
+      - name: Capturas no iPad
+        timeout-minutes: 12
+        continue-on-error: true
+        run: bash ios/ci/shots-ipad.sh
       - name: Publicar capturas e log
         if: always()
         run: |

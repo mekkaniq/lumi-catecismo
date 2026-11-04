@@ -48,4 +48,5 @@ shot dark-hub -shot hub -demo
 shot dark-book -shot book -book maior -demo
 shot dark-quiz -shot quiz -demo -answer right
 shot dark-settings -shot hub -demo -settings
+
 echo "Capturas:"; ls shots

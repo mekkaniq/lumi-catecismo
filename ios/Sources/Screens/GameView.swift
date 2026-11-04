@@ -30,6 +30,7 @@ private struct GameBody: View {
             .padding(.horizontal, 16)
             .padding(.top, 14)
             .padding(.bottom, g.done ? 12 : 40)
+            .readable()
         }
         .scrollDismissesKeyboard(.immediately)
         .background(Backdrop())
