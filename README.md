@@ -1,4 +1,4 @@
-# Catecismos Verso Vivo
+# Verso Vivo Catecismos
 
 Os padrões de Westminster em jogos, para estudar em casa e ensinar na igreja:
 

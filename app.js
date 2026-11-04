@@ -1,4 +1,4 @@
-/* ===== Catecismos Verso Vivo — Breve Catecismo, Catecismo Maior e Confissão de Fé ===== */
+/* ===== Verso Vivo Catecismos — Breve Catecismo, Catecismo Maior e Confissão de Fé ===== */
 const app=document.getElementById('app');
 const KEY='lumi-catecismo-v1';
 
@@ -206,14 +206,14 @@ function installCard(){
 const BARC={hub:'#1c140a',breve:'#1a2412',maior:'#2a0f12',conf:'#0d202c'};
 function barColor(){const m=document.querySelector('meta[name=theme-color]');if(m)m.content=BARC[document.documentElement.dataset.book]||BARC.hub}
 
-/* ===== capa geral: Catecismos Verso Vivo ===== */
+/* ===== capa geral: Verso Vivo Catecismos ===== */
 function vHub(){
   const line=hubLine();
   return `
   <div class="band hub"><div class="wrap hero">
     <div class="hero-top"><span></span>${fsBtn()}</div>
     <div class="hero-text"><p class="eyebrow">Westminster · em jogos</p>
-    <h1 class="roll" aria-label="Catecismos Verso Vivo">${rollHTML('Catecismos Verso Vivo')}</h1>
+    <h1 class="roll" aria-label="Verso Vivo Catecismos">${rollHTML('Verso Vivo Catecismos')}</h1>
     <p>O Breve Catecismo, o Catecismo Maior e a Confissão de Fé, para aprender em casa e ensinar na igreja.</p></div>
     <div class="scene-wrap">${booksScene()}</div>
     <div class="bubble hub-bubble" aria-live="polite">${line.html}</div>
@@ -245,7 +245,7 @@ function vHub(){
         <button class="tool" data-act="text" data-t="credo"><b>Credo</b><span>Credo Apostólico</span></button>
       </div>
     </section>
-    <p class="foot">Funciona sem internet depois do primeiro acesso.<br>O progresso de cada livro fica salvo neste aparelho.<br><span class="sign">Catecismos Verso Vivo · Padrões de Westminster</span><br><a class="by" href="https://instagram.com/yesdudu" target="_blank" rel="noopener">Feito por Eduardo de Souza</a></p>
+    <p class="foot">Funciona sem internet depois do primeiro acesso.<br>O progresso de cada livro fica salvo neste aparelho.<br><span class="sign">Verso Vivo Catecismos · Padrões de Westminster</span><br><a class="by" href="https://instagram.com/yesdudu" target="_blank" rel="noopener">Feito por Eduardo de Souza</a></p>
   </main>`;
 }
 

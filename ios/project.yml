@@ -22,7 +22,7 @@ targets:
     info:
       path: Config/Info.plist
       properties:
-        CFBundleDisplayName: Catecismos
+        CFBundleDisplayName: Verso Vivo Catecismos
         UIAppFonts: [Cinzel-Bold.ttf]
         CFBundleDevelopmentRegion: pt-BR
         CFBundleLocalizations: [pt-BR]

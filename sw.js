@@ -1,4 +1,4 @@
-/* Catecismos Verso Vivo — funciona sem internet.
+/* Verso Vivo Catecismos — funciona sem internet.
    Arquivos do app: tenta a rede (até 3 s) e guarda a cópia; sem rede, usa a cópia guardada.
    Fontes e imagens vêm do próprio site (nada de Google Fonts). Ao publicar mudança grande, troque a versão. */
 const V='verso-vivo-catecismos-v2';
