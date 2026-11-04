@@ -27,7 +27,7 @@ private struct ShakeEffect: GeometryEffect {
     }
 }
 
-/// A Lumi (ilustração) com respiração suave e reação a acertos e erros.
+/// A Nine (ilustração) com respiração suave e reação a acertos e erros.
 struct LumiView: View {
     var mood: LumiMood
     var pose: LumiPose? = nil
@@ -80,7 +80,7 @@ struct LumiView: View {
     }
 }
 
-/// A Lumi brincando com os três livros (recepção).
+/// A Nine brincando com os três livros (recepção).
 struct BooksScene: View {
     var open: (String) -> Void
 
@@ -188,7 +188,7 @@ struct BooksScene: View {
 }
 
 
-/// Balão curto ao lado da Lumi, com a pontinha apontando para ela.
+/// Balão curto ao lado da Nine, com a pontinha apontando para ela.
 struct SpeechPop: View {
     let text: String
     var size: CGFloat = 12
@@ -213,7 +213,7 @@ struct SpeechPop: View {
     }
 }
 
-/// A Lumi que reage ao toque: ri de cócegas, dança, pula, dá uma voltinha, cochila e fala.
+/// A Nine que reage ao toque: ri de cócegas, dança, pula, dá uma voltinha, cochila e fala.
 struct PlayfulLumi: View {
     var basePose: LumiPose = .dica
     var onPhrase: (String?) -> Void
@@ -254,7 +254,7 @@ struct PlayfulLumi: View {
             .contentShape(Rectangle())
             .onTapGesture { tap() }
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel("Lumi. Toque para brincar com ela")
+            .accessibilityLabel("Nine. Toque para brincar com ela")
             .accessibilityAddTraits(.isButton)
             .onAppear {
                 // só para a captura de tela do CI

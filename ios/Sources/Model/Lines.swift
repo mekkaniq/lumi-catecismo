@@ -1,6 +1,6 @@
 import Foundation
 
-/// Falas da Lumi (capa geral e cada livro), com o tom de cada um. **negrito** vira destaque.
+/// Falas da Nine (capa geral e cada livro), com o tom de cada um. **negrito** vira destaque.
 @MainActor
 enum Lines {
     static func greet() -> String {
@@ -32,7 +32,7 @@ enum Lines {
         let lb = s.lastBook.map { Library.book($0).name }
         let any = Library.order.contains { s.hasProgress($0) }
         if !any {
-            return (.happy, "\(greet())! Eu sou a Lumi. Trouxe três livros para estudarmos juntos: o **Breve Catecismo**, o **Catecismo Maior** e a **Confissão de Fé**. Toque em um deles!")
+            return (.happy, "\(greet())! Eu sou a Nine. Trouxe três livros para estudarmos juntos: o **Breve Catecismo**, o **Catecismo Maior** e a **Confissão de Fé**. Toque em um deles!")
         }
         if ds >= 4 {
             return (.sleep, "Zzz… ah, \(greet().lowercased())! Fiquei cuidando dos livros esses \(ds) dias. Vamos voltar ao \(lb ?? "estudo")?")

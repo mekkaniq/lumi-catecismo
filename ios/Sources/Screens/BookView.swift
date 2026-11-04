@@ -25,7 +25,7 @@ struct BookView: View {
                 .padding(.bottom, 44)
             }
         }
-        .background(Pal.bg.ignoresSafeArea())
+        .background(Backdrop())
         .environment(\.theme, theme)
         .heroScreen(theme)
     }
@@ -66,7 +66,7 @@ struct BookView: View {
                     .frame(width: 124, height: 150)
                 }
                 .buttonStyle(PressStyle())
-                .accessibilityLabel("Pedir uma \(book.isConf ? "seção" : "pergunta") surpresa à Lumi")
+                .accessibilityLabel("Pedir uma \(book.isConf ? "seção" : "pergunta") surpresa à Nine")
             }
             .padding(.top, 4)
 

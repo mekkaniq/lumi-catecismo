@@ -80,7 +80,7 @@ struct ResultView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 18)
         }
-        .background(Pal.bg.ignoresSafeArea())
+        .background(Backdrop())
         .environment(\.theme, theme)
         .lumiBar(theme, solid: true, title: "Resultado")
         .overlay { if r >= 0.8 { Confetti() } }
