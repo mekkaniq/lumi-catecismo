@@ -1,4 +1,4 @@
-/* ===== Lumi Catecismos — Breve Catecismo, Catecismo Maior e Confissão de Fé ===== */
+/* ===== Catecismos Verso Vivo — Breve Catecismo, Catecismo Maior e Confissão de Fé ===== */
 const app=document.getElementById('app');
 const KEY='lumi-catecismo-v1';
 
@@ -73,67 +73,43 @@ const mood=m=>(isConf()&&m==='cheer')?'happy':m;
 function flameSVG(on){return `<svg viewBox="0 0 12 16" aria-hidden="true"><path class="${on?'on':'off'}" d="M6 15C2.5 15 1 12.5 1.6 9.8 2.2 7.2 4.6 6 5 1c2.6 2.3 5.4 5.4 5.4 9 0 3-1.8 5-4.4 5z"/></svg>`}
 function flamesRow(n){const s=stars(n);return `<span class="flames" aria-label="${s} de 3">${[0,1,2].map(i=>flameSVG(i<s)).join('')}</span>`}
 
-function bushSVG(){
-  const fl=(x,h,w,l,base)=>`M${x} ${base} C${x-w} ${base-h*.35} ${x-w*.55+l} ${base-h*.78} ${x+l} ${base-h} C${x+w*.55+l} ${base-h*.72} ${x+w} ${base-h*.35} ${x} ${base}Z`;
-  const outer=[[20,30,10,-4],[34,46,11,-3],[48,58,12,-1],[61,66,12,0],[74,58,12,1],[88,46,11,3],[102,30,10,4]];
-  const inner=[[34,24,5,-2],[48,32,6,-1],[61,38,6,0],[74,32,6,1],[88,24,5,2]];
-  return `<svg class="bush" viewBox="0 0 122 92" aria-hidden="true">${outer.map(f=>`<path class="f1" d="${fl(f[0],f[1],f[2],f[3],78)}"/>`).join('')}${inner.map(f=>`<path class="f2" d="${fl(f[0],f[1],f[2],f[3],78)}"/>`).join('')}<rect class="bar" x="16" y="84" width="90" height="4" rx="2"/></svg>`;
+
+/* ===== Nine: poses e reações =====
+   moods: idle, happy, cheer, meh, sad, think, sleep. As poses são as mesmas imagens do app Verso Vivo. */
+const POSE={idle:'oi',happy:'oi',cheer:'festa',meh:'pensando',sad:'pensando',think:'pensando',sleep:'dormindo',hint:'dica',read:'lendo'};
+const POSEWH={oi:[314,360],festa:[351,360],pensando:[299,360],dica:[360,390],lendo:[360,357],dormindo:[360,261],sarca:[360,360]};
+/* quadro de "piscar" por cima: [esquerda, topo, largura] em % da imagem */
+const BLINKWH={oi:[147,106],pensando:[144,108],dica:[149,104],lendo:[147,67]};
+const BLINK={oi:[33.76,21.67,46.82],pensando:[32.11,21.94,48.16],dica:[32.82,24.87,38.21],lendo:[29.17,33.61,40.83]};
+const IMG='/img/nine-';
+function poseOf(mood,stage){return stage&&(mood==='idle'||mood==='happy'||mood==='meh')?'sarca':(POSE[mood]||'oi')}
+function nineHTML(mood='idle',attrs='',stage=false){
+  const p=poseOf(mood,stage),b=BLINK[p];
+  return `<span class="nine" data-mood="${mood}" ${attrs} aria-hidden="true"><img class="ni" src="${IMG}${p}.webp" alt="" draggable="false">${b?`<img class="ne" src="${IMG}${p}-pisca.webp" style="left:${b[0]}%;top:${b[1]}%;width:${b[2]}%" alt="" draggable="false">`:''}${mood==='sleep'?'<span class="zz"><i>z</i><i>z</i></span>':''}${mood==='think'?'<span class="tdots"><i></i><i></i><i></i></span>':''}</span>`;
+}
+/* versão para dentro do SVG da capa: x, y e altura em unidades do desenho */
+function nineSVG(mood,x,y,h,extra=''){
+  const p=poseOf(mood,false),wh=POSEWH[p],w=wh[0]*h/wh[1],b=BLINK[p];
+  let eye='';
+  if(b){const bw=w*b[2]/100,bh=bw*BLINKWH[p][1]/BLINKWH[p][0];
+    eye=`<image class="ne" href="${IMG}${p}-pisca.webp" x="${(x+w*b[0]/100).toFixed(1)}" y="${(y+h*b[1]/100).toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}"/>`}
+  return `<g class="nine nine-svg" data-mood="${mood}" ${extra}><image href="${IMG}${p}.webp" x="${x}" y="${y}" width="${w.toFixed(1)}" height="${h}"/>${eye}</g>`;
+}
+function nineReact(m,ms=850){
+  m=mood(m);const el=document.querySelector('.nine-live');if(!el)return;
+  el.innerHTML=nineHTML(m);el.firstElementChild.classList.add(m==='sad'?'shake':m==='meh'?'tilt':'hop');
+  clearTimeout(nineReact.t);
+  nineReact.t=setTimeout(()=>{const e=document.querySelector('.nine-live');if(e&&S.v==='game'&&!S.g.done)e.innerHTML=nineHTML('think')},ms);
 }
 
-/* ===== Lumi: humores e reações =====
-   moods: idle, happy, cheer, meh, sad, think, sleep */
-function lumiSVG(mood='idle',attrs=''){
-  const W='stroke="#fff" fill="none" stroke-linecap="round"';
-  const eyes={
-    idle:`<g class="eyes"><circle cx="66" cy="32" r="2" fill="#fff"/><circle cx="74" cy="32" r="2" fill="#fff"/></g>`,
-    happy:`<g class="eyes"><circle cx="66" cy="32" r="2.1" fill="#fff"/><circle cx="74" cy="32" r="2.1" fill="#fff"/></g>`,
-    cheer:`<path d="M63.8 33q2.2-2.8 4.4 0M71.8 33q2.2-2.8 4.4 0" ${W} stroke-width="1.7"/>`,
-    sad:`<path d="M63.4 30.4l4-1.8M76.6 30.4l-4-1.8" ${W} stroke-width="1.4"/><circle cx="66" cy="33" r="1.6" fill="#fff"/><circle cx="74" cy="33" r="1.6" fill="#fff"/>`,
-    think:`<circle cx="66" cy="32" r="2.6" fill="#fff"/><circle cx="74" cy="32" r="2.6" fill="#fff"/><circle cx="67" cy="30.9" r="1.15" fill="var(--face)"/><circle cx="75" cy="30.9" r="1.15" fill="var(--face)"/>`,
-    sleep:`<path d="M63.8 32q2.2 2.2 4.4 0M71.8 32q2.2 2.2 4.4 0" ${W} stroke-width="1.6"/>`,
-    meh:`<path d="M71.8 28.4l4.4-.9" ${W} stroke-width="1.4"/><circle cx="65.4" cy="32.4" r="1.9" fill="#fff"/><circle cx="73.4" cy="32.4" r="1.9" fill="#fff"/>`
-  }[mood]||'';
-  const mouth={
-    idle:`<path d="M66 39q3.5 3.2 7 0" ${W} stroke-width="1.7"/>`,
-    happy:`<path d="M65 38.6q4.5 4.6 9 0" ${W} stroke-width="1.8"/>`,
-    cheer:`<path d="M65.4 38.4q4.1 6.4 8.2 0z" fill="#fff"/>`,
-    sad:`<path d="M66 41.8q3.5-2.8 7 0" ${W} stroke-width="1.7"/>`,
-    think:`<path d="M67.6 40.4h4" ${W} stroke-width="1.7"/>`,
-    sleep:`<circle cx="69.6" cy="40" r="1.3" ${W} stroke-width="1.3"/>`,
-    meh:`<path d="M65.8 40.4q1.8-1.4 3.6 0t3.6 0" ${W} stroke-width="1.6"/>`
-  }[mood]||'';
-  const cheeks=(mood==='happy'||mood==='cheer')?`<ellipse cx="62.8" cy="37.2" rx="2" ry="1.3" fill="#f2a0a6" opacity=".75"/><ellipse cx="77.2" cy="37.2" rx="2" ry="1.3" fill="#f2a0a6" opacity=".75"/>`:'';
-  const extra={
-    sad:`<path class="tear" d="M63 37.5c-1.2 2-1.6 3-1.6 3.8a1.6 1.6 0 0 0 3.2 0c0-.8-.4-1.8-1.6-3.8z" fill="#7cc4f0"/>`,
-    think:`<g class="dots" fill="var(--gold)"><circle cx="86" cy="15" r="1.6"/><circle cx="91" cy="9" r="2.1"/><circle cx="97" cy="2" r="2.7"/></g>`,
-    sleep:`<g class="zz" fill="currentColor" font-family="var(--f-display)" font-weight="700"><text x="82" y="16" font-size="8">z</text><text x="89" y="7" font-size="11">z</text></g>`,
-    cheer:`<g class="spark" fill="var(--gold)"><path d="M8 10l1.6 3.4L13 15l-3.4 1.6L8 20l-1.6-3.4L3 15l3.4-1.6z"/><path d="M90 2l1.2 2.6L94 6l-2.8 1.4L90 10l-1.2-2.6L86 6l2.8-1.4z"/><path d="M4 40l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"/></g>`
-  }[mood]||'';
-  return `<svg class="lumi" data-mood="${mood}" ${attrs} viewBox="-2 -6 102 82" aria-hidden="true" style="color:var(--ink,var(--fg))">
-  <g class="body"><path d="M30 55v12M42 57v12M56 57v12" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/>
-  <path fill="var(--wool)" stroke="currentColor" stroke-width="2.2" d="M20 42c-8 0-11-8-7-13 0-8 9-11 14-8 3-7 13-8 17-3 6-4 15-1 16 5 7 0 11 7 8 12 4 6 0 13-7 13-1 6-9 9-14 5-4 5-13 5-16 0-7 3-13-1-11-11z"/></g>
-  <g class="head"><ellipse class="ear" cx="61" cy="25" rx="7" ry="3.4" transform="rotate(-28 61 25)" fill="var(--face)"/>
-  <ellipse cx="70" cy="34" rx="10.5" ry="12.5" fill="var(--face)"/>
-  <ellipse cx="80" cy="27" rx="6" ry="3" transform="rotate(25 80 27)" fill="var(--face)"/>
-  ${eyes}${cheeks}${mouth}${extra}
-  <path class="flame" d="M60 14c2-4 1-7 0-9 3 2 6 5 5 9-1 2-3 2-5 0z" fill="var(--gold)"/></g>
-  </svg>`;
-}
-function lumiReact(m,ms=850){
-  m=mood(m);const el=document.querySelector('.lumi-live');if(!el)return;
-  el.innerHTML=lumiSVG(m);el.firstElementChild.classList.add(m==='sad'?'shake':m==='meh'?'tilt':'hop');
-  clearTimeout(lumiReact.t);
-  lumiReact.t=setTimeout(()=>{const e=document.querySelector('.lumi-live');if(e&&S.v==='game'&&!S.g.done)e.innerHTML=lumiSVG('think')},ms);
-}
-
-/* ===== a Lumi brincando com os três livros (capa) ===== */
+/* ===== a Nine brincando com os três livros (capa) ===== */
 function booksScene(){
   const book=(id,x,y,w,h,label,cls='',left=false)=>`<g class="bk ${cls}" data-act="openbook" data-b="${id}" role="button" tabindex="0" aria-label="Abrir ${BOOKS[id].name}">
     <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${BOOKS[id].color}"/>
     <rect x="${x}" y="${y}" width="${w}" height="3" rx="1.5" fill="#fff" opacity=".18"/>
     <rect x="${x+9}" y="${y}" width="2.4" height="${h}" fill="#e0ad4a" opacity=".9"/><rect x="${x+w-11.4}" y="${y}" width="2.4" height="${h}" fill="#e0ad4a" opacity=".9"/>
     <text x="${left?x+15:x+w/2}" y="${y+h/2+3.6}" text-anchor="${left?'start':'middle'}" fill="#f6ecd6" font-size="10" font-weight="700" letter-spacing="1.4" font-family="var(--f-display)">${label}</text></g>`;
-  return `<svg class="scene" viewBox="0 0 330 200" aria-label="A Lumi brincando com os três livros">
+  return `<svg class="scene" viewBox="0 0 330 200" aria-label="A Nine brincando com os três livros">
     <ellipse cx="190" cy="186" rx="130" ry="9" fill="#000" opacity=".22"/>
     ${book('maior',96,150,190,30,'CATECISMO MAIOR')}
     ${book('conf',110,121,164,29,'CONFISSÃO','bk-conf',true)}
@@ -142,7 +118,7 @@ function booksScene(){
       <rect x="292" y="95" width="30" height="2.4" fill="#e0ad4a"/><rect x="292" y="168" width="30" height="2.4" fill="#e0ad4a"/>
       <text transform="rotate(-90 307 133)" x="307" y="136.5" text-anchor="middle" fill="#f6ecd6" font-size="9.5" font-weight="700" letter-spacing="1.2" font-family="var(--f-display)">BREVE</text></g>
     <g class="page"><path d="M40 168c10-8 22-8 32 0-10-3-22-3-32 0z" fill="#f6ecd6"/><path d="M40 168v-2c10-7 22-7 32 0v2" fill="none" stroke="#e0ad4a" stroke-width="1"/></g>
-    <g class="lumi-on-books">${lumiSVG('happy','x="160" y="38" width="130" height="104"')}</g>
+    <g class="nine-on-books">${nineSVG('happy',150,24,100)}</g>
     <g class="notes" fill="#e0ad4a"><path d="M262 40l1.4 3 3 1.4-3 1.4-1.4 3-1.4-3-3-1.4 3-1.4z"/><path d="M84 92l1 2.2 2.2 1-2.2 1-1 2.2-1-2.2-2.2-1 2.2-1z"/></g>
   </svg>`;
 }
@@ -161,16 +137,16 @@ function weekQ(b=B){
 }
 function greet(){const h=new Date().getHours();return h<12?'Bom dia':h<18?'Boa tarde':'Boa noite'}
 
-/* falas da Lumi: na capa geral e em cada livro (com o tom de cada um) */
+/* falas da Nine: na capa geral e em cada livro (com o tom de cada um) */
 function hubLine(){
   const ds=daysSince(P.lastDay),lb=P.lastBook&&BOOKS[P.lastBook];
   const any=ORDER.some(id=>Object.keys(bp(id).m).length);
-  if(!any)return {mood:'happy',html:`${greet()}! Eu sou a Lumi. Trouxe três livros para estudarmos juntos: o <b>Breve Catecismo</b>, o <b>Catecismo Maior</b> e a <b>Confissão de Fé</b>. Toque em um deles!`};
+  if(!any)return {mood:'happy',html:`${greet()}! Eu sou a Nine. Trouxe três livros para estudarmos juntos: o <b>Breve Catecismo</b>, o <b>Catecismo Maior</b> e a <b>Confissão de Fé</b>. Toque em um deles!`};
   if(ds>=4)return {mood:'sleep',html:`Zzz… ah, ${greet().toLowerCase()}! Fiquei cuidando dos livros esses ${ds} dias. Vamos voltar ao ${lb?lb.name:'estudo'}?`};
   if(ds===0)return {mood:'cheer',html:`Você já estudou hoje! Quer continuar no <b>${lb?lb.name:'Breve Catecismo'}</b> ou abrir outro livro?`};
   return {mood:'idle',html:`${greet()}! Da última vez você estava no <b>${lb?lb.name:'Breve Catecismo'}</b>. Vamos continuar?`};
 }
-function lumiLine(){
+function nineLine(){
   const id=B.id;
   if(S.poke){const n=S.poke.n,x=it(n);
     if(!S.poke.rev){
@@ -224,20 +200,20 @@ function installCard(){
   const standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone;
   if(standalone||P.hideInstall)return '';
   const ios=/iP(hone|ad|od)/.test(navigator.userAgent);
-  return `<section class="install"><div><b>Use como aplicativo</b><span>${ios?'No Safari, toque em <b>Compartilhar</b> e depois em <b>Adicionar à Tela de Início</b>.':'No navegador, abra o menu <b>⋮</b> e toque em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.'} Assim a Lumi abre direto e funciona sem internet.</span></div><button class="btn sm" data-act="hideinstall">Entendi</button></section>`;
+  return `<section class="install"><div><b>Use como aplicativo</b><span>${ios?'No Safari, toque em <b>Compartilhar</b> e depois em <b>Adicionar à Tela de Início</b>.':'No navegador, abra o menu <b>⋮</b> e toque em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.'} Assim a Nine abre direto e funciona sem internet.</span></div><button class="btn sm" data-act="hideinstall">Entendi</button></section>`;
 }
 /* cor da barra do celular acompanha o livro */
-const BARC={hub:'#123d26',breve:'#123d26',maior:'#3f161b',conf:'#102c3a'};
+const BARC={hub:'#1c140a',breve:'#1a2412',maior:'#2a0f12',conf:'#0d202c'};
 function barColor(){const m=document.querySelector('meta[name=theme-color]');if(m)m.content=BARC[document.documentElement.dataset.book]||BARC.hub}
 
-/* ===== capa geral: Lumi Catecismos ===== */
+/* ===== capa geral: Catecismos Verso Vivo ===== */
 function vHub(){
   const line=hubLine();
   return `
   <div class="band hub"><div class="wrap hero">
     <div class="hero-top"><span></span>${fsBtn()}</div>
     <div class="hero-text"><p class="eyebrow">Westminster · em jogos</p>
-    <h1 class="roll" aria-label="Lumi Catecismos">${rollHTML('Lumi Catecismos')}</h1>
+    <h1 class="roll" aria-label="Catecismos Verso Vivo">${rollHTML('Catecismos Verso Vivo')}</h1>
     <p>O Breve Catecismo, o Catecismo Maior e a Confissão de Fé, para aprender em casa e ensinar na igreja.</p></div>
     <div class="scene-wrap">${booksScene()}</div>
     <div class="bubble hub-bubble" aria-live="polite">${line.html}</div>
@@ -269,7 +245,7 @@ function vHub(){
         <button class="tool" data-act="text" data-t="credo"><b>Credo</b><span>Credo Apostólico</span></button>
       </div>
     </section>
-    <p class="foot">Funciona sem internet depois do primeiro acesso.<br>O progresso de cada livro fica salvo neste aparelho.<br><span class="sign">Lumi Catecismos · Padrões de Westminster</span></p>
+    <p class="foot">Funciona sem internet depois do primeiro acesso.<br>O progresso de cada livro fica salvo neste aparelho.<br><span class="sign">Catecismos Verso Vivo · Padrões de Westminster</span><br><a class="by" href="https://instagram.com/yesdudu" target="_blank" rel="noopener">Feito por Eduardo de Souza</a></p>
   </main>`;
 }
 
@@ -278,16 +254,16 @@ function vBook(){
   const p=pct(all()),learned=all().filter(n=>stars(n)>0).length;
   const days=Object.keys(P.days||{}).length;
   const last=bp().last!=null&&B.units[bp().last]?bp().last:null;
-  const wk=weekQ(),line=lumiLine(),w=it(wk.n);
+  const wk=weekQ(),line=nineLine(),w=it(wk.n);
   return `
   <div class="band"><div class="wrap hero">
-    <div class="hero-top"><button class="back-hub" data-act="home">‹ Lumi Catecismos</button>${fsBtn()}</div>
+    <div class="hero-top"><button class="back-hub" data-act="home">‹ Catecismos</button>${fsBtn()}</div>
     <div class="hero-text"><p class="eyebrow">${B.tag}</p>
     <h1 class="roll" aria-label="${B.full}">${rollHTML(B.full)}</h1>
     <p>${B.sub}</p></div>
-    <div class="lumi-row">
+    <div class="nine-row">
       <div class="bubble" aria-live="polite">${line.html}</div>
-      <button class="lumi-stage" data-act="poke" aria-label="Pedir uma ${isConf()?'seção':'pergunta'} surpresa à Lumi">${bushSVG()}${lumiSVG(line.mood)}</button>
+      <button class="nine-stage" data-act="poke" aria-label="Pedir uma ${isConf()?'seção':'pergunta'} surpresa à Nine">${nineHTML(line.mood,'',true)}</button>
     </div>
     <div class="hero-stats"><span><b>${p}%</b> do livro</span><span><b>${learned}</b> de ${B.items.length} praticad${isConf()?'as':'as'}</span><span><b>${days}</b> dia${days===1?'':'s'} de estudo</span></div>
     <div class="overall" title="${p}% concluído"><i style="width:${p}%"></i></div>
@@ -452,7 +428,7 @@ function vGame(){
   return topbar(MODE_NAME[g.mode],'quit',`${g.i+1}/${g.items.length}`)+`
   <main class="wrap" style="padding-bottom:${g.done?'12px':'48px'}">
     <div class="dots">${dots}</div>
-    <div class="qhead"><div style="min-width:0">${head}</div><div class="lumi-live">${lumiSVG(g.done?mood(g.mood):'think')}</div></div>
+    <div class="qhead"><div style="min-width:0">${head}</div><div class="nine-live">${nineHTML(g.done?mood(g.mood):'think')}</div></div>
     ${body}
   </main>${fb}`;
 }
@@ -471,7 +447,7 @@ function vResult(){
   const md=mood(r>=.8?'cheer':r>=.5?'happy':'sad');
   return topbar('Resultado',g.back==='book'?'bookhome':'backunit','')+`
   <main class="wrap"><section class="card result">
-    <div class="result-lumi">${lumiSVG(md)}</div>
+    <div class="result-nine">${nineHTML(md)}</div>
     <div class="big">${g.ok}/${t}</div>
     <h2>${msg}</h2>
     <ul class="qlist" style="width:100%;text-align:left">${g.items.map(x=>`<li><div class="qrow" style="cursor:default"><span class="n">${isConf()?it(x.n).ch+'.'+it(x.n).sec:x.n}</span><span>${esc(isConf()?it(x.n).q:it(x.n).q)}</span>${flamesRow(x.n)}</div></li>`).join('')}</ul>
@@ -494,7 +470,7 @@ function vClass(){
   return topbar('Modo Classe',S.from==='hub'?'home':'bookhome',`${S.ci+1}/${list.length}`)+`
   <div class="class">
     <div class="stage">
-      <div class="class-top"><div class="qnum">${B.name} · ${x.label}${S.cu>=0&&!isConf()?' · Lição '+(S.cu+1):''}</div><div class="class-lumi">${lumiSVG(S.crev?'happy':'think')}</div></div>
+      <div class="class-top"><div class="qnum">${B.name} · ${x.label}${S.cu>=0&&!isConf()?' · Lição '+(S.cu+1):''}</div><div class="class-nine">${nineHTML(S.crev?'happy':'think')}</div></div>
       <div class="qtext">${esc(x.q)}</div>
       <div class="atext ${S.crev?'':'hidden'}">${esc(x.a)}</div>
       ${S.crev&&x.r?`<div class="refs">${esc(x.r)}</div>`:''}
@@ -527,11 +503,11 @@ function vText(){
     <div class="row"><button class="btn" data-act="speakT">▶ Ouvir</button></div></article></main>`;
 }
 
-function renderLumiRow(anim){
-  const row=document.querySelector('.lumi-row');if(!row)return render();
-  const line=lumiLine();row.querySelector('.bubble').innerHTML=line.html;
-  const st=row.querySelector('.lumi-stage');st.querySelector('.lumi').outerHTML=lumiSVG(line.mood);
-  if(anim)st.querySelector('.lumi').classList.add(anim);
+function renderNineRow(anim){
+  const row=document.querySelector('.nine-row');if(!row)return render();
+  const line=nineLine();row.querySelector('.bubble').innerHTML=line.html;
+  const st=row.querySelector('.nine-stage');st.querySelector('.nine').outerHTML=nineHTML(line.mood,'',true);
+  if(anim)st.querySelector('.nine').classList.add(anim);
 }
 function render(){
   app.innerHTML=({hub:vHub,book:vBook,unit:vUnit,study:vStudy,game:vGame,result:vResult,class:vClass,text:vText}[S.v]||vHub)();
@@ -585,7 +561,7 @@ function initCardRoll(){
 }
 
 /* ===== Fundo em shader: gradiente vivo, luz de glória no alto e brasa da sarça embaixo ===== */
-const FXC={hub:['#0b2619','#2c6a4c','#e7b552'],breve:['#0b2619','#2a6b45','#e7b552'],maior:['#24090e','#83303a','#e7b552'],conf:['#08202c','#26627f','#ecc56e']};
+const FXC={hub:['#120c06','#4a3414','#f0cd7e'],breve:['#0e170a','#3d5a2a','#f0cd7e'],maior:['#1c0a0c','#7a2f38','#f0cd7e'],conf:['#071720','#245a74','#f0cd7e']};
 const FS=`precision mediump float;uniform vec2 r;uniform float t;uniform vec3 A,B,C;
 float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+1.),f.x),f.y);}
@@ -637,7 +613,7 @@ const ACT={
   fontsize:()=>{const k=FONTS.indexOf(P.fs||1);P.fs=FONTS[(k+1)%FONTS.length];save();applyFS();render()},
   hideinstall:()=>{P.hideInstall=1;save();render()},
   openbook:b=>{const id=b.dataset.b;
-const sc=document.querySelector('.lumi-on-books .lumi');
+const sc=document.querySelector('.nine-on-books .nine');
     if(sc&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){sc.classList.add('hop');setTimeout(()=>openBook(id),280)}else openBook(id)},
   bookhome:()=>{S.poke=null;go('book')},
   unit:b=>{const u=+b.dataset.u;bp().last=u;save();go('unit',{u})},
@@ -654,11 +630,11 @@ const sc=document.querySelector('.lumi-on-books .lumi');
   qopt:b=>{const m=+b.dataset.m,x=it(S.g.items[S.g.i].n);S.g.st.chosen=m;const ok=isConf()?m===x.ch:m===S.g.items[S.g.i].n;if(!ok)S.g.miss=1;answered(ok)},
   cpick:b=>{const g=S.g,st=g.st,k=+b.dataset.k,item=st.bank[k];
     const exp=norm(st.words[st.blanks[st.filled]]);
-    if(norm(item.w)===exp){item.used=true;st.filled++;if(st.filled>=st.blanks.length)return answered(g.miss<=1);render();lumiReact('happy',700);}
-    else{g.miss++;b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');const m=document.querySelector('.miss');if(m)m.textContent=misses(g);else render();lumiReact(g.miss>=2?'sad':'meh',900);}},
+    if(norm(item.w)===exp){item.used=true;st.filled++;if(st.filled>=st.blanks.length)return answered(g.miss<=1);render();nineReact('happy',700);}
+    else{g.miss++;b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');const m=document.querySelector('.miss');if(m)m.textContent=misses(g);else render();nineReact(g.miss>=2?'sad':'meh',900);}},
   bpick:b=>{const g=S.g,st=g.st,k=+b.dataset.k;const exp=st.chunks[st.placed.length];
-    if(st.chunks[k]===exp){st.placed.push(k);st.used.add(k);if(st.placed.length===st.chunks.length)return answered(g.miss<=1);render();lumiReact('happy',700);}
-    else{g.miss++;b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');const m=document.querySelector('.miss');if(m)m.textContent=misses(g);else render();lumiReact(g.miss>=2?'sad':'meh',900);}},
+    if(st.chunks[k]===exp){st.placed.push(k);st.used.add(k);if(st.placed.length===st.chunks.length)return answered(g.miss<=1);render();nineReact('happy',700);}
+    else{g.miss++;b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');const m=document.querySelector('.miss');if(m)m.textContent=misses(g);else render();nineReact(g.miss>=2?'sad':'meh',900);}},
   cont:()=>{const g=S.g;g.i++;if(g.i>=g.items.length)return go('result');setupItem();go('game')},
   speakA:()=>{const x=it(S.g.items[S.g.i].n);speak(x.q+'. '+x.a)},
   class:()=>{const from=S.v==='hub'?'hub':'book';if(from==='hub')setBook(P.lastBook||'breve');go('class',{cu:bp().last!=null?bp().last:0,ci:0,crev:false,from})},
@@ -670,12 +646,12 @@ const sc=document.querySelector('.lumi-on-books .lumi');
   full:()=>{try{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}},
   text:b=>go('text',{t:b.dataset.t}),
   speakT:()=>{const t=TEXTS[S.t];speak(t.list?t.list.map((x,i)=>(i+1)+'. '+x).join(' '):t.body)},
-  poke:()=>{let n;do{n=pick(all())}while(S.poke&&n===S.poke.n);S.poke={n,rev:false};renderLumiRow('hop')},
-  pokerev:()=>{if(S.poke){S.poke.rev=true;renderLumiRow('hop')}},
+  poke:()=>{let n;do{n=pick(all())}while(S.poke&&n===S.poke.n);S.poke={n,rev:false};renderNineRow('hop')},
+  pokerev:()=>{if(S.poke){S.poke.rev=true;renderNineRow('hop')}},
   weekstudy:()=>{const n=weekQ().n,u=unitOf(n);bp().last=u;save();S.u=u;go('study',{i:n-B.units[u].a,rev:false})},
   weekclass:()=>{const n=weekQ().n,u=unitOf(n);go('class',{cu:u,ci:n-B.units[u].a,crev:false,from:'book'})},
   sctoggle:()=>{P.score=P.score||{a:0,b:0,on:false};P.score.on=!P.score.on;save();render()},
-  sc:b=>{P.score=P.score||{a:0,b:0,on:true};const t=b.dataset.t;P.score[t]=Math.max(0,P.score[t]+(+b.dataset.v));save();render();if(+b.dataset.v>0){const l=document.querySelector('.class-lumi .lumi');if(l){l.outerHTML=lumiSVG('cheer');document.querySelector('.class-lumi .lumi').classList.add('hop')}}},
+  sc:b=>{P.score=P.score||{a:0,b:0,on:true};const t=b.dataset.t;P.score[t]=Math.max(0,P.score[t]+(+b.dataset.v));save();render();if(+b.dataset.v>0){const l=document.querySelector('.class-nine .nine');if(l){l.outerHTML=nineHTML('cheer');document.querySelector('.class-nine .nine').classList.add('hop')}}},
   sczero:()=>{P.score={a:0,b:0,on:true};save();render()}
 };
 /* luz que segue o dedo/mouse nos cartões */
