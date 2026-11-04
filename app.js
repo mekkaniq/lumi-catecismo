@@ -211,7 +211,7 @@ function vHub(){
   const line=hubLine();
   return `
   <div class="band hub"><div class="wrap hero">
-    <div class="hero-top"><span></span>${fsBtn()}</div>
+    <div class="hero-top"><span class="hero-cross" aria-hidden="true"><svg viewBox="0 0 24 34" width="22" height="31"><path d="M10.2 1.5h3.6v8.2h8.2v3.6h-8.2v19.2h-3.6V13.3H2V9.7h8.2z" fill="currentColor"/></svg></span>${fsBtn()}</div>
     <div class="hero-text"><p class="eyebrow">Westminster · em jogos</p>
     <h1 class="roll" aria-label="Verso Vivo Catecismos">${rollHTML('Verso Vivo Catecismos')}</h1>
     <p>O Breve Catecismo, o Catecismo Maior e a Confissão de Fé, para aprender em casa e ensinar na igreja.</p></div>
@@ -265,7 +265,7 @@ function vBook(){
       <div class="bubble" aria-live="polite">${line.html}</div>
       <button class="nine-stage" data-act="poke" aria-label="Pedir uma ${isConf()?'seção':'pergunta'} surpresa à Nine">${nineHTML(line.mood,'',true)}</button>
     </div>
-    <div class="hero-stats"><span><b>${p}%</b> do livro</span><span><b>${learned}</b> de ${B.items.length} praticad${isConf()?'as':'as'}</span><span><b>${days}</b> dia${days===1?'':'s'} de estudo</span></div>
+    <div class="hero-stats"><span><b>${p}%</b> do livro</span><span><b>${learned}</b> de ${B.items.length} praticad${isConf()?'as':'as'}</span></div>
     <div class="overall" title="${p}% concluído"><i style="width:${p}%"></i></div>
   </div></div>
   <main class="wrap">

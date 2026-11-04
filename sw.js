@@ -1,7 +1,7 @@
 /* Verso Vivo Catecismos — funciona sem internet.
    Arquivos do app: tenta a rede (até 3 s) e guarda a cópia; sem rede, usa a cópia guardada.
    Fontes e imagens vêm do próprio site (nada de Google Fonts). Ao publicar mudança grande, troque a versão. */
-const V='verso-vivo-catecismos-v2';
+const V='verso-vivo-catecismos-v3';
 const IMG=['dica','dica-pisca','dormindo','festa','lendo','lendo-pisca','oi','oi-pisca','pensando','pensando-pisca','rosto','sarca'].map(n=>'/img/nine-'+n+'.webp');
 const CORE=['/','/index.html','/app.js','/data.js','/data-maior.js','/data-conf.js','/manifest.webmanifest','/icon-192.png','/icon-512.png','/apple-touch-icon.png',
   '/fonts/Cinzel-Variable.woff','/fonts/Lora-Variable.woff','/fonts/Lora-Italic-Variable.woff','/img/mundo1.webp','/img/mundo2.webp','/img/mundo3.webp',...IMG];

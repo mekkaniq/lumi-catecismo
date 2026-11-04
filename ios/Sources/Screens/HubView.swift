@@ -31,11 +31,18 @@ struct HubView: View {
         VStack(alignment: .leading, spacing: 10) {
             HeroTopBar(showBack: false)
                 .padding(.bottom, 2)
-            Text("WESTMINSTER · EM JOGOS")
-                .font(.caption.weight(.semibold))
-                .tracking(2.4)
-                .foregroundStyle(Pal.brightGold)
-            RollingTitle("Verso Vivo Catecismos", font: .display(.largeTitle))
+            HStack(spacing: 8) {
+                Image(systemName: "cross.fill")
+                    .font(.footnote)
+                    .foregroundStyle(Pal.brightGold)
+                    .shadow(color: Pal.brightGold.opacity(0.6), radius: 6)
+                    .accessibilityHidden(true)
+                Text("WESTMINSTER · EM JOGOS")
+                    .font(.caption.weight(.semibold))
+                    .tracking(2.4)
+                    .foregroundStyle(Pal.brightGold)
+            }
+            RollingTitle("Verso Vivo Catecismos", font: .display(.title))
             Text("O Breve Catecismo, o Catecismo Maior e a Confissão de Fé, para aprender em casa e ensinar na igreja.")
                 .font(.callout)
                 .foregroundStyle(.white.opacity(0.86))
