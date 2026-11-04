@@ -23,6 +23,7 @@ struct BookView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 24)
                 .padding(.bottom, 44)
+                .readable()
             }
         }
         .background(Backdrop())
@@ -78,7 +79,8 @@ struct BookView: View {
         .padding(.horizontal, 20)
         .padding(.top, 2)
         .padding(.bottom, 26)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: 760, alignment: .leading)
+        .frame(maxWidth: .infinity)
         .background { HeroBackground(theme: theme) }
     }
 

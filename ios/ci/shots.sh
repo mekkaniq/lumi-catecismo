@@ -48,4 +48,31 @@ shot dark-hub -shot hub -demo
 shot dark-book -shot book -book maior -demo
 shot dark-quiz -shot quiz -demo -answer right
 shot dark-settings -shot hub -demo -settings
+
+# ---- iPad ----
+PAD=$(xcrun simctl list devices available -j | python3 -c "
+import json,sys
+d=json.load(sys.stdin)['devices']
+c=[x for k,v in d.items() if 'iOS' in k for x in v if 'iPad' in x['name']]
+want=['iPad Pro 11-inch (M5)','iPad Pro 11-inch (M4)','iPad Air 11-inch (M3)','iPad (A16)','iPad (10th generation)']
+for w in want:
+    for x in c:
+        if x['name']==w: print(x['udid']); sys.exit()
+print(c[0]['udid'] if c else '')")
+if [ -n "$PAD" ]; then
+  echo "iPad: $PAD"
+  xcrun simctl shutdown "$UDID" || true
+  xcrun simctl boot "$PAD" || true
+  xcrun simctl bootstatus "$PAD" -b
+  xcrun simctl install "$PAD" "$APP"
+  UDID=$PAD
+  xcrun simctl ui "$UDID" appearance light
+  shot ipad-hub -shot hub -demo
+  shot ipad-book -shot book -book breve -demo
+  shot ipad-quiz -shot quiz -demo -answer right
+  shot ipad-class -shot class -demo
+  xcrun simctl ui "$UDID" appearance dark
+  shot ipad-dark-hub -shot hub -demo
+  shot ipad-dark-book -shot book -book maior -demo
+fi
 echo "Capturas:"; ls shots

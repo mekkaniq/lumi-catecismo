@@ -69,6 +69,7 @@ struct ClassView: View {
             }
             .padding(.horizontal, 20)
             .padding(.vertical, compact ? 8 : 16)
+            .readable(1000)
         }
     }
 

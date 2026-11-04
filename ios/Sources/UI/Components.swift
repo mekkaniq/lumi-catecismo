@@ -494,3 +494,10 @@ struct HeroBackground: View {
         .accessibilityHidden(true)
     }
 }
+
+extension View {
+    /// Em telas largas (iPad), limita o conteúdo a uma coluna legível e centralizada.
+    func readable(_ width: CGFloat = 760) -> some View {
+        frame(maxWidth: width).frame(maxWidth: .infinity)
+    }
+}
