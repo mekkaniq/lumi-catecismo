@@ -42,6 +42,7 @@ shot result -shot result -demo
 shot finish -shot lastq -demo
 shot settings -shot hub -demo -settings
 shot class -shot class -demo
+shot class-pick -shot class -demo -classpick
 shot text -shot text -demo
 xcrun simctl ui "$UDID" appearance dark
 shot dark-hub -shot hub -demo

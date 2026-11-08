@@ -11,6 +11,7 @@ struct ClassView: View {
     @State private var u: Int
     @State private var idx: Int
     @State private var rev = false
+    @State private var picking = false
 
     init(startBook: String, startUnit: Int, startIndex: Int) {
         _bookID = State(initialValue: startBook)
@@ -37,7 +38,22 @@ struct ClassView: View {
         .environment(\.theme, theme)
         .lumiBar(theme, solid: true, title: "Modo Classe · \(i + 1)/\(list.count)")
         .toolbar(compact ? .hidden : .visible, for: .navigationBar)
-        .onAppear { UIApplication.shared.isIdleTimerDisabled = true }
+        .sheet(isPresented: $picking) {
+            ClassPicker(bookID: bookID, u: u, current: x.n) { id, unit, n in
+                if id != bookID { bookID = id; store.setLastBook(id) }
+                u = unit
+                let l = Library.book(id).nums(unit)
+                idx = l.firstIndex(of: n) ?? 0
+                rev = false
+                picking = false
+            }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
+        .onAppear {
+            UIApplication.shared.isIdleTimerDisabled = true
+            if ProcessInfo.processInfo.arguments.contains("-classpick") { picking = true }
+        }
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
             Speaker.shared.stop()
@@ -138,8 +154,7 @@ struct ClassView: View {
             if compact {
                 HStack(spacing: 8) {
                     backButton
-                    bookMenu
-                    unitMenu
+                    chooseButton(x)
                     prevButton(i)
                     revealButton
                     shuffleButton(list.count, i)
@@ -150,8 +165,7 @@ struct ClassView: View {
             } else {
                 VStack(spacing: 10) {
                     HStack(spacing: 8) {
-                        bookMenu
-                        unitMenu
+                        chooseButton(x)
                         Spacer(minLength: 0)
                         scoreButton
                         speakButton(x)
@@ -176,21 +190,28 @@ struct ClassView: View {
             .accessibilityLabel("Voltar")
     }
 
-    private var bookMenu: some View {
-        Menu {
-            ForEach(Library.order, id: \.self) { id in
-                Button(Library.book(id).name) { switchBook(id) }
+    /// Um botão só para escolher livro, lição e a pergunta exata.
+    private func chooseButton(_ x: Item) -> some View {
+        Button { picking = true } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "list.number").font(.subheadline.weight(.bold))
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(book.short + (u < 0 ? " · livro todo" : " · \(book.unitWord) \(book.unitNum(u))"))
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(Pal.muted)
+                    Text("\(book.itemWord) \(book.isConf ? "\(x.ch ?? 0).\(x.sec ?? 0)" : "\(x.n)")")
+                        .font(.subheadline.weight(.bold))
+                }
+                .lineLimit(1)
+                Image(systemName: "chevron.up.chevron.down").font(.caption2)
             }
-        } label: { menuLabel(book.short) }
-    }
-
-    private var unitMenu: some View {
-        Menu {
-            Button("Livro inteiro") { u = -1; idx = 0; rev = false }
-            ForEach(Array(book.units.enumerated()), id: \.offset) { k, un in
-                Button("\(book.unitWord) \(book.unitNum(k)) · \(TextTools.trunc(un.t, 40))") { u = k; idx = 0; rev = false }
-            }
-        } label: { menuLabel(u < 0 ? "Livro todo" : "\(book.unitWord) \(book.unitNum(u))") }
+            .foregroundStyle(Pal.fg)
+            .padding(.horizontal, 14)
+            .frame(height: 46)
+            .background(Pal.surface, in: Capsule())
+        }
+        .buttonStyle(PressStyle())
+        .accessibilityLabel("Escolher livro, lição e pergunta")
     }
 
     private func prevButton(_ i: Int) -> some View {
@@ -234,27 +255,7 @@ struct ClassView: View {
             .accessibilityLabel("Ouvir")
     }
 
-    private func menuLabel(_ t: String) -> some View {
-        HStack(spacing: 6) {
-            Text(t).lineLimit(1)
-            Image(systemName: "chevron.up.chevron.down").font(.caption2)
-        }
-        .font(.subheadline.weight(.semibold))
-        .foregroundStyle(Pal.fg)
-        .padding(.horizontal, 14)
-        .frame(height: 46)
-        .background(Pal.surface, in: Capsule())
-    }
-
     // MARK: ações
-    private func switchBook(_ id: String) {
-        bookID = id
-        u = store.last(id) ?? 0
-        idx = 0
-        rev = false
-        store.setLastBook(id)
-    }
-
     private func move(_ d: Int, _ cur: Int, _ count: Int = Int.max) {
         let n = cur + d
         guard n >= 0, n < count else { return }
@@ -268,5 +269,116 @@ struct ClassView: View {
         while n == cur { n = Int.random(in: 0..<count) }
         idx = n
         rev = false
+    }
+}
+
+/// Tela de escolha do Modo Classe: livro, lição (ou livro todo) e o número exato da pergunta.
+struct ClassPicker: View {
+    @EnvironmentObject private var store: Store
+    @Environment(\.dismiss) private var dismiss
+    @State var bookID: String
+    let origin: String
+    let u: Int
+    let current: Int
+    let choose: (String, Int, Int) -> Void
+
+    init(bookID: String, u: Int, current: Int, choose: @escaping (String, Int, Int) -> Void) {
+        _bookID = State(initialValue: bookID)
+        origin = bookID
+        self.u = u
+        self.current = current
+        self.choose = choose
+    }
+
+    private var book: Book { Library.book(bookID) }
+    private var theme: Theme { Theme.of(bookID) }
+    private let cols = [GridItem(.adaptive(minimum: 52), spacing: 8)]
+
+    var body: some View {
+        NavigationStack {
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 14) {
+                        Picker("Livro", selection: $bookID) {
+                            ForEach(Library.order, id: \.self) { id in Text(Library.book(id).short).tag(id) }
+                        }
+                        .pickerStyle(.segmented)
+
+                        Button { choose(bookID, -1, book.all.first ?? 1) } label: {
+                            HStack {
+                                Image(systemName: "books.vertical.fill")
+                                Text("Livro inteiro, em ordem").font(.body.weight(.semibold))
+                                Spacer()
+                                Text(book.countsLine).font(.footnote).foregroundStyle(Pal.muted)
+                            }
+                            .padding(14)
+                            .card(radius: 16)
+                        }
+                        .buttonStyle(PressStyle())
+
+                        ForEach(Array(book.units.enumerated()), id: \.offset) { k, un in
+                            unitBlock(k, un).id(k)
+                        }
+                    }
+                    .padding(16)
+                    .readable(760)
+                }
+                .onAppear {
+                    if u >= 0 { proxy.scrollTo(u, anchor: .top) }
+                }
+            }
+            .background(Pal.bg.ignoresSafeArea())
+            .navigationTitle("Escolher pergunta")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Fechar") { dismiss() } }
+            }
+        }
+        .environment(\.theme, theme)
+        .tint(theme.accent)
+    }
+
+    private func unitBlock(_ k: Int, _ un: Unit) -> some View {
+        let here = bookID == origin && (u < 0 || k == u)
+        return VStack(alignment: .leading, spacing: 10) {
+            Button { choose(bookID, k, un.a) } label: {
+                HStack(alignment: .firstTextBaseline) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("\(book.unitWord.uppercased()) \(book.unitNum(k))")
+                            .font(.caption.weight(.bold))
+                            .tracking(1.2)
+                            .foregroundStyle(theme.accent)
+                        Text(un.t)
+                            .font(.display(.headline))
+                            .foregroundStyle(Pal.fg)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer()
+                    Text("Começar")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(theme.accent)
+                }
+            }
+            .buttonStyle(.plain)
+
+            LazyVGrid(columns: cols, spacing: 8) {
+                ForEach(un.a...un.b, id: \.self) { n in
+                    let x = book.item(n)
+                    let on = n == current && here
+                    Button { choose(bookID, k, n) } label: {
+                        Text(book.isConf ? "\(x.ch ?? 0).\(x.sec ?? 0)" : "\(n)")
+                            .font(.callout.weight(.bold))
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                            .foregroundStyle(on ? Pal.bg : Pal.fg)
+                            .background(on ? theme.accent : theme.soft, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    }
+                    .buttonStyle(PressStyle())
+                    .accessibilityLabel("\(book.itemWord) \(x.label)")
+                }
+            }
+        }
+        .padding(14)
+        .card(radius: 18)
     }
 }
