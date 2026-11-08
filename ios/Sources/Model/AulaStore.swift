@@ -191,17 +191,14 @@ final class AulaStore: ObservableObject {
             try renderer.writePDF(to: url) { ctx in
                 for (k, f) in frames.enumerated() {
                     ctx.beginPage()
+                    // Desenha o slide como imagem (fiel ao app, com o brilho do fundo) e põe na página.
                     let view = SlideView(aula: a, frame: f, index: k, total: frames.count, images: images)
                         .frame(width: size.width, height: size.height)
                     let r = ImageRenderer(content: view)
                     r.proposedSize = ProposedViewSize(size)
-                    let cg = ctx.cgContext
-                    r.render { _, draw in
-                        cg.saveGState()
-                        cg.translateBy(x: 0, y: size.height)
-                        cg.scaleBy(x: 1, y: -1)
-                        draw(cg)
-                        cg.restoreGState()
+                    r.scale = 2
+                    if let img = r.uiImage, let jpg = img.jpegData(compressionQuality: 0.88), let page = UIImage(data: jpg) {
+                        page.draw(in: CGRect(origin: .zero, size: size))
                     }
                 }
             }

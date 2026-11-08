@@ -29,6 +29,7 @@ struct AulaEditView: View {
                     .font(.display(.title3))
                     .foregroundStyle(Pal.fg)
                 themePicker
+                actions
             }
             .listRowBackground(Pal.surface)
 
@@ -60,20 +61,6 @@ struct AulaEditView: View {
         .lumiBar(theme, solid: true, title: "Aula")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) { EditButton() }
-            ToolbarItemGroup(placement: .bottomBar) {
-                Menu {
-                    Button { presentRemote = true } label: { Label("No computador da igreja", systemImage: "desktopcomputer") }
-                    Button { presentHere = true } label: { Label("Neste aparelho", systemImage: "iphone") }
-                } label: { Label("Apresentar", systemImage: "play.rectangle.fill").labelStyle(.titleAndIcon) }
-                    .disabled(a.slides.isEmpty)
-                Spacer()
-                Menu {
-                    Button { exportPDF() } label: { Label("PDF", systemImage: "doc.richtext") }
-                    Button { run("Gerando o PowerPoint…") { share = SharedFile(url: try await aulas.exportPptx(save())) } } label: { Label("PowerPoint (.pptx)", systemImage: "rectangle.on.rectangle") }
-                    Button { run("Preparando o arquivo…") { share = SharedFile(url: try await aulas.exportPackage(save())) } } label: { Label("Arquivo da aula (para editar ou enviar)", systemImage: "square.and.arrow.up.on.square") }
-                } label: { Label("Baixar", systemImage: "square.and.arrow.up").labelStyle(.titleAndIcon) }
-                    .disabled(a.slides.isEmpty)
-            }
         }
         .sheet(item: Binding(get: { editing.map { EditID(id: $0) } }, set: { editing = $0?.id })) { e in
             if let b = binding(e.id) {
@@ -105,8 +92,8 @@ struct AulaEditView: View {
             }
         }
         .sheet(item: $share) { f in ShareSheet(url: f.url).presentationDetents([.medium, .large]) }
-        .fullScreenCover(isPresented: $presentHere) { AulaShowView(aula: save()).environmentObject(aulas) }
-        .fullScreenCover(isPresented: $presentRemote) { RemoteView(aula: save()).environmentObject(aulas) }
+        .fullScreenCover(isPresented: $presentHere) { AulaShowView(aula: a).environmentObject(aulas) }
+        .fullScreenCover(isPresented: $presentRemote) { RemoteView(aula: a).environmentObject(aulas) }
         .overlay { if let busy { BusyOverlay(text: busy) } }
         .alert("Não deu certo", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
             Button("OK", role: .cancel) {}
@@ -136,6 +123,37 @@ struct AulaEditView: View {
 
     @discardableResult
     private func save() -> Aula { aulas.save(a) }
+
+    /// Apresentar e baixar, bem à vista.
+    private var actions: some View {
+        HStack(spacing: 10) {
+            Menu {
+                Button { presentRemote = true } label: { Label("No computador da igreja", systemImage: "desktopcomputer") }
+                Button { presentHere = true } label: { Label("Neste aparelho", systemImage: "iphone") }
+            } label: {
+                Label("Apresentar", systemImage: "play.fill")
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(Pal.ink)
+                    .frame(maxWidth: .infinity).frame(height: 46)
+                    .background(LinearGradient(colors: [Color(hex: 0xf6d98e), Color(hex: 0xd8a94a)], startPoint: .top, endPoint: .bottom), in: Capsule())
+            }
+            Menu {
+                Button { exportPDF() } label: { Label("PDF", systemImage: "doc.richtext") }
+                Button { run("Gerando o PowerPoint…") { share = SharedFile(url: try await aulas.exportPptx(save())) } } label: { Label("PowerPoint (.pptx)", systemImage: "rectangle.on.rectangle") }
+                Button { run("Preparando o arquivo…") { share = SharedFile(url: try await aulas.exportPackage(save())) } } label: { Label("Arquivo da aula (para editar ou enviar)", systemImage: "square.and.arrow.up.on.square") }
+            } label: {
+                Label("Baixar", systemImage: "square.and.arrow.down")
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(Pal.fg)
+                    .frame(maxWidth: .infinity).frame(height: 46)
+                    .background(Pal.bg, in: Capsule())
+                    .overlay(Capsule().stroke(Pal.line, lineWidth: 1))
+            }
+        }
+        .disabled(a.slides.isEmpty)
+        .buttonStyle(.plain)
+        .padding(.vertical, 4)
+    }
 
     private var themePicker: some View {
         HStack(spacing: 12) {
