@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Apresentar aula · Verso Vivo</title>
+<meta name="theme-color" content="#16100a">
+<link rel="icon" href="/icon-192.png">
+<style>
+@font-face{font-family:'Cinzel';src:url(/fonts/Cinzel-Variable.woff) format('woff');font-weight:400 900;font-display:swap}
+@font-face{font-family:'Lora';src:url(/fonts/Lora-Variable.woff) format('woff');font-weight:400 700;font-display:swap}
+@font-face{font-family:'Lora';src:url(/fonts/Lora-Italic-Variable.woff) format('woff');font-weight:400 700;font-style:italic;font-display:swap}
+:root{--ink:#16100a;--cream:#fbf1d8;--muted:#cfc09a;--gold:#f0cd7e;--line:#4a3b20}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#000;color:var(--cream);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;overflow:hidden}
+button{font:inherit;cursor:pointer}
+
+/* tela de espera */
+#lobby{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:radial-gradient(1200px 700px at 75% 15%,#3d5a2a 0%,rgba(61,90,42,.25) 45%,transparent 70%),radial-gradient(600px 400px at 80% 8%,rgba(240,205,126,.18),transparent 70%),#0e170a}
+.card{width:min(980px,100%);display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+@media (max-width:760px){.card{grid-template-columns:1fr}}
+.kicker{font-family:'Cinzel',serif;letter-spacing:.22em;font-size:14px;color:var(--gold);text-transform:uppercase}
+h1{font-family:'Cinzel',serif;font-size:clamp(30px,4.2vw,52px);line-height:1.1;margin:10px 0 18px}
+.lead{font-size:18px;line-height:1.55;color:var(--muted)}
+.steps{margin:22px 0 0 0;list-style:none;display:grid;gap:12px}
+.steps li{display:flex;gap:12px;align-items:flex-start;font-size:17px;line-height:1.45}
+.steps b{display:inline-flex;min-width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;background:rgba(240,205,126,.16);color:var(--gold);font-size:14px}
+.codebox{background:rgba(22,16,10,.55);border:1px solid rgba(240,205,126,.28);border-radius:28px;padding:30px 26px;text-align:center;backdrop-filter:blur(8px)}
+.codebox small{display:block;color:var(--muted);font-size:15px;margin-bottom:10px}
+#code{font-family:'Cinzel',serif;font-weight:700;font-size:clamp(54px,8vw,92px);letter-spacing:.12em;color:var(--cream)}
+#status{margin-top:14px;font-size:15px;color:var(--muted);min-height:22px}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.btn{border:1px solid rgba(240,205,126,.35);background:rgba(240,205,126,.1);color:var(--cream);padding:12px 18px;border-radius:999px;font-size:15px}
+.btn.gold{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:600}
+.drop{outline:3px dashed var(--gold);outline-offset:-14px}
+.foot{position:fixed;left:0;right:0;bottom:14px;text-align:center;font-size:13px;color:rgba(207,192,154,.6)}
+
+/* palco 16:9 */
+#show{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:#000}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:0 0;overflow:hidden}
+.sl{position:absolute;inset:0;background-size:cover;background-position:center}
+.sl .ft{position:absolute;left:84px;right:84px;bottom:22px;height:44px;display:flex;justify-content:space-between;align-items:flex-end;font-size:18px;opacity:.75;border-top:2px solid;padding-top:10px}
+.lab{position:absolute;left:84px;right:84px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;font-size:23px}
+.ser{font-family:'Lora',Georgia,serif;font-weight:700;line-height:1.18}
+.box{position:absolute;display:flex}
+.ans{border-radius:22px;padding:30px 36px;font-family:'Lora',Georgia,serif;line-height:1.4}
+.opt{position:absolute;border-radius:20px;display:flex;align-items:center;gap:18px;padding:0 30px;font-size:40px;line-height:1.25;transition:all .35s}
+.opt b{font-size:40px}
+ul.tp{list-style:none;display:grid;gap:22px}
+ul.tp li{display:flex;gap:22px;align-items:baseline}
+ul.tp li:before{content:'';flex:none;width:14px;height:14px;border-radius:50%;background:currentColor;transform:translateY(-4px);opacity:.9}
+.img{position:absolute;object-fit:contain}
+#black{position:fixed;inset:0;background:#000;display:none;z-index:5}
+#hud{position:fixed;right:16px;bottom:14px;z-index:6;display:flex;gap:8px;opacity:0;transition:opacity .3s}
+body.mouse #hud{opacity:1}
+#hud button{background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:999px;padding:8px 14px;font-size:14px}
+#toast{position:fixed;left:50%;top:18px;transform:translateX(-50%);background:rgba(0,0,0,.7);border:1px solid rgba(240,205,126,.4);color:var(--cream);padding:10px 18px;border-radius:999px;font-size:15px;z-index:7;opacity:0;transition:opacity .3s;pointer-events:none}
+</style>
+</head>
+<body>
+<div id="lobby">
+  <div class="card">
+    <div>
+      <div class="kicker">Verso Vivo · Catecismos</div>
+      <h1>Apresentar uma aula</h1>
+      <p class="lead">Deixe esta tela no projetor ou na TV. A aula vem do celular, e o celular passa os slides.</p>
+      <ol class="steps">
+        <li><b>1</b><span>No app <strong>Catecismos</strong>, abra <strong>Minhas aulas</strong> e escolha a aula.</span></li>
+        <li><b>2</b><span>Toque em <strong>Apresentar → No computador</strong>.</span></li>
+        <li><b>3</b><span>Digite o código ao lado. Pronto: o celular vira o controle.</span></li>
+      </ol>
+    </div>
+    <div class="codebox" id="drop">
+      <small>Código desta tela</small>
+      <div id="code">······</div>
+      <div id="status">Abrindo a sala…</div>
+      <div class="row">
+        <button class="btn" id="openFile">Abrir arquivo da aula</button>
+        <button class="btn" id="fsBtn">Tela cheia</button>
+      </div>
+      <input type="file" id="file" accept=".vvaula,application/zip" hidden>
+    </div>
+  </div>
+  <div class="foot">Também dá para passar os slides com as setas do teclado ou com um passador. B escurece a tela. F é tela cheia.</div>
+</div>
+
+<div id="show"><div id="stage"></div></div>
+<div id="black"></div>
+<div id="hud"><button id="hPrev">◀</button><button id="hNext">▶</button><button id="hFs">Tela cheia</button><button id="hEnd">Encerrar</button></div>
+<div id="toast"></div>
+
+<script src="vendor/jszip.min.js"></script>
+<script src="aula-kit.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+(function () {
+  'use strict';
+  var URL_SB = 'https://tohphjpibyfikrmgswhk.supabase.co';
+  var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvaHBoanBpYnlmaWtybWdzd2hrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxMjYzODAsImV4cCI6MjEwOTcwMjM4MH0.pGoIL1m6unwubNwNBGhz7CzNynyfW-5yjPOrDOuSCZ0';
+  var K = window.AulaKit;
+  var $ = function (id) { return document.getElementById(id); };
+  var sb = window.supabase ? window.supabase.createClient(URL_SB, KEY) : null;
+
+  var code = null, channel = null, aula = null, media = {}, fr = [], cur = 0, bgCache = {};
+
+  function toast(t) { var e = $('toast'); e.textContent = t; e.style.opacity = 1; clearTimeout(toast.t); toast.t = setTimeout(function () { e.style.opacity = 0; }, 2600); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function px(pt) { return Math.round(pt * 1600 / 960); }
+  function fitPx(t, a, b, n) { return px(K.fit(t, a, b, n)); }
+
+  // ---------- sala ----------
+  function openRoom() {
+    if (!sb) { $('status').textContent = 'Sem internet: abra o arquivo da aula.'; return; }
+    $('status').textContent = 'Abrindo a sala…';
+    sb.rpc('nova_sala').then(function (r) {
+      if (r.error || !r.data) { $('status').textContent = 'Não consegui abrir a sala. Você ainda pode abrir o arquivo da aula.'; return; }
+      code = r.data;
+      $('code').textContent = code.slice(0, 3) + ' ' + code.slice(3);
+      $('status').textContent = 'Esperando o celular…';
+      if (channel) sb.removeChannel(channel);
+      channel = sb.channel('sala-' + code, { config: { broadcast: { self: false } } })
+        .on('broadcast', { event: 'cmd' }, function (m) { onCmd(m.payload || {}); })
+        .subscribe(function (st) { if (st === 'SUBSCRIBED') ping(); });
+    });
+  }
+  function ping(extra) {
+    if (!sb || !code) return;
+    sb.rpc('sala_ping', Object.assign({ p_code: code, p_carregada: aula ? true : false, p_quadro: cur }, extra || {})).then(function () {});
+  }
+  setInterval(function () { ping(); }, 8000);
+
+  function onCmd(c) {
+    if (c.t === 'load' && c.file) {
+      $('status').textContent = 'Recebendo a aula…';
+      toast('Recebendo a aula…');
+      fetch(URL_SB + '/storage/v1/object/public/aulas/' + c.file)
+        .then(function (r) { if (!r.ok) throw new Error('download'); return r.arrayBuffer(); })
+        .then(K.unpack)
+        .then(function (x) { load(x.aula, x.media, c.f || 0); toast('Aula “' + (x.aula.title || '') + '” pronta'); })
+        .catch(function () { $('status').textContent = 'Não consegui baixar a aula. Tente enviar de novo.'; });
+    } else if (c.t === 'go' && aula) { go(c.f | 0, true); $('black').style.display = 'none'; }
+    else if (c.t === 'black') { $('black').style.display = c.on ? 'block' : 'none'; }
+    else if (c.t === 'end') { end(); }
+    else if (c.t === 'hello') { $('status').textContent = 'Celular conectado. Enviando a aula…'; }
+  }
+
+  // ---------- aula ----------
+  function load(a, m, f) {
+    aula = a; media = m || {}; fr = K.frames(aula);
+    var T = K.theme(aula);
+    if (!bgCache[aula.theme]) bgCache[aula.theme] = K.backdrop(T, 1600, 900);
+    $('lobby').style.display = 'none';
+    $('show').style.display = 'flex';
+    go(f || 0, true);
+    ping({ p_carregada: true });
+  }
+  function end() {
+    aula = null; fr = []; cur = 0;
+    $('show').style.display = 'none'; $('black').style.display = 'none';
+    $('lobby').style.display = 'flex';
+    openRoom();
+  }
+  function go(i, quiet) {
+    if (!aula || !fr.length) return;
+    cur = Math.max(0, Math.min(fr.length - 1, i));
+    $('stage').innerHTML = render(fr[cur], cur);
+    scale();
+    if (!quiet) ping({ p_quadro: cur });
+  }
+
+  function render(f, k) {
+    var s = aula.slides[f.i], T = K.theme(aula);
+    var c = function (h) { return '#' + h; };
+    var bg = (s.kind === 'pagina') ? 'background:#000' : 'background-color:' + c(T.bg) + ';background-image:url(' + bgCache[aula.theme] + ')';
+    var h = '<div class="sl" style="' + bg + ';color:' + c(T.fg) + '">';
+    var L = 84, W = 1600 - 2 * L;
+    var lab = function (t, y) { return '<div class="lab" style="top:' + y + 'px;color:' + c(T.accent) + '">' + esc(t) + '</div>'; };
+    var img = function (name, x, y, w, hh) {
+      if (!name || !media[name]) return '';
+      return '<img class="img" src="' + media[name] + '" style="left:' + x + 'px;top:' + y + 'px;width:' + w + 'px;height:' + hh + 'px">';
+    };
+    switch (s.kind) {
+      case 'titulo':
+        if (s.text) h += lab(s.text, 330);
+        h += '<div class="ser" style="position:absolute;left:' + L + 'px;width:' + W + 'px;top:390px;font-size:' + fitPx(s.title, 54, 34, 90) + 'px">' + esc(s.title) + '</div>';
+        if (s.items && s.items[0]) h += '<div style="position:absolute;left:' + L + 'px;top:640px;font-size:36px;color:' + c(T.muted) + '">' + esc(s.items[0]) + '</div>';
+        break;
+      case 'catecismo':
+        h += lab(s.label || 'Catecismo', 80);
+        if (f.step === 0) {
+          h += '<div class="box ser" style="left:' + L + 'px;width:' + W + 'px;top:150px;height:640px;align-items:center;font-size:' + fitPx(s.q, 48, 32, 160) + 'px">' + esc(s.q) + '</div>';
+        } else {
+          h += '<div class="ser" style="position:absolute;left:' + L + 'px;width:' + W + 'px;top:150px;font-size:' + fitPx(s.q, 30, 22, 160) + 'px">' + esc(s.q) + '</div>';
+          h += '<div class="ans" style="position:absolute;left:' + L + 'px;width:' + W + 'px;top:440px;height:' + (s.r ? 310 : 370) + 'px;background:' + c(T.card) + ';border:1px solid ' + c(T.accent) + '55;font-size:' + fitPx(s.a, 34, 16, 900) + 'px">' + esc(s.a) + '</div>';
+          if (s.r) h += '<div style="position:absolute;left:' + L + 'px;top:768px;font-size:20px;color:' + c(T.muted) + '">' + esc(s.r) + '</div>';
+        }
+        break;
+      case 'biblia':
+        h += '<div class="box" style="left:' + (L + 60) + 'px;width:' + (W - 120) + 'px;top:110px;height:600px;align-items:center;justify-content:center;text-align:center;font-family:Lora,Georgia,serif;font-style:italic;line-height:1.35;font-size:' + fitPx(s.text, 40, 20, 700) + 'px">“' + esc(s.text) + '”</div>';
+        h += '<div style="position:absolute;left:0;right:0;top:730px;text-align:center;font-weight:700;font-size:36px;color:' + c(T.accent) + '">' + esc(s.ref) + (s.version ? ' · ' + esc(s.version) : '') + '</div>';
+        break;
+      case 'topicos': {
+        var items = (s.items || []).filter(function (x) { return x && x.trim(); });
+        if (s.title) h += '<div class="ser" style="position:absolute;left:' + L + 'px;width:' + W + 'px;top:80px;font-size:' + fitPx(s.title, 40, 28, 80) + 'px">' + esc(s.title) + '</div>';
+        h += '<ul class="tp" style="position:absolute;left:' + L + 'px;width:' + (s.img ? 1100 : W) + 'px;top:' + (s.title ? 250 : 120) + 'px;font-size:' + fitPx(items.join(' '), 28, 16, 700) + 'px;line-height:1.3">' +
+          items.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
+        h += img(s.img, 1200, 250, 330, 500);
+        break;
+      }
+      case 'imagem':
+        h += img(s.img, L, 70, W, s.title ? 640 : 740);
+        if (s.title) h += '<div style="position:absolute;left:0;right:0;top:735px;text-align:center;font-size:34px">' + esc(s.title) + '</div>';
+        break;
+      case 'pagina':
+        h += img(s.img, 0, 0, 1600, 900);
+        break;
+      case 'discussao':
+        h += lab(s.text || 'Para conversar', 190);
+        h += '<div class="box ser" style="left:' + L + 'px;width:' + W + 'px;top:260px;height:520px;align-items:center;font-size:' + fitPx(s.title, 46, 28, 220) + 'px">' + esc(s.title) + '</div>';
+        break;
+      case 'quiz': {
+        h += '<div class="box ser" style="left:' + L + 'px;width:' + W + 'px;top:70px;height:260px;align-items:center;font-size:' + fitPx(s.title, 38, 24, 180) + 'px">' + esc(s.title) + '</div>';
+        var opts = (s.items || []).filter(function (x) { return x && x.trim(); }).slice(0, 4);
+        var cw = (W - 40) / 2, rh = 200;
+        opts.forEach(function (o, j) {
+          var x = L + (j % 2) * (cw + 40), y = 370 + Math.floor(j / 2) * (rh + 30);
+          var right = f.step === 1 && j === (s.ok || 0), dim = f.step === 1 && !right;
+          h += '<div class="opt" style="left:' + x + 'px;top:' + y + 'px;width:' + cw + 'px;height:' + rh + 'px;background:' + (right ? c(T.ok) : c(T.card)) + ';color:' + (right ? '#10200c' : c(T.fg)) + ';opacity:' + (dim ? .45 : 1) + ';border:1px solid ' + (right ? c(T.ok) : c(T.accent) + '55') + ';font-size:' + fitPx(o, 26, 16, 120) + 'px">' +
+            '<b style="color:' + (right ? '#10200c' : c(T.accent)) + '">' + K.LETTERS[j] + '</b><span>' + esc(o) + '</span></div>';
+        });
+        break;
+      }
+    }
+    if (s.kind !== 'pagina') {
+      h += '<div class="ft" style="border-color:' + c(T.accent) + '66;color:' + c(T.muted) + '"><span>' + esc(aula.title) + '</span><span>' + (k + 1) + ' / ' + fr.length + '</span></div>';
+    }
+    return h + '</div>';
+  }
+
+  function scale() {
+    var k = Math.min(window.innerWidth / 1600, window.innerHeight / 900);
+    var st = $('stage');
+    st.style.transformOrigin = 'center center';
+    st.style.transform = 'translate(-50%,-50%) scale(' + k + ')';
+  }
+  window.addEventListener('resize', scale);
+
+  // ---------- teclado, passador, mouse ----------
+  document.addEventListener('keydown', function (e) {
+    var k = e.key;
+    if (k === 'f' || k === 'F') { fs(); return; }
+    if (!aula) return;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Enter' || k === 'ArrowDown') { e.preventDefault(); go(cur + 1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp' || k === 'ArrowUp' || k === 'Backspace') { e.preventDefault(); go(cur - 1); }
+    else if (k === 'b' || k === 'B' || k === '.') { var bl = $('black'); bl.style.display = bl.style.display === 'block' ? 'none' : 'block'; }
+    else if (k === 'Home') go(0);
+    else if (k === 'End') go(fr.length - 1);
+  });
+  $('stage').addEventListener('click', function (e) { if (aula) go(e.clientX < window.innerWidth / 3 ? cur - 1 : cur + 1); });
+  var mt;
+  document.addEventListener('mousemove', function () { document.body.classList.add('mouse'); clearTimeout(mt); mt = setTimeout(function () { document.body.classList.remove('mouse'); }, 2200); });
+  $('hPrev').onclick = function () { go(cur - 1); };
+  $('hNext').onclick = function () { go(cur + 1); };
+  $('hFs').onclick = fs; $('fsBtn').onclick = fs;
+  $('hEnd').onclick = end;
+  function fs() { if (!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); else document.exitFullscreen && document.exitFullscreen(); }
+
+  // ---------- abrir arquivo ----------
+  function openBlob(f) {
+    if (!f) return;
+    f.arrayBuffer().then(K.unpack).then(function (x) { load(x.aula, x.media, 0); }).catch(function (e) { $('status').textContent = e.message || 'Arquivo inválido.'; });
+  }
+  $('openFile').onclick = function () { $('file').click(); };
+  $('file').onchange = function () { openBlob(this.files[0]); this.value = ''; };
+  var d = $('lobby');
+  d.addEventListener('dragover', function (e) { e.preventDefault(); $('drop').classList.add('drop'); });
+  d.addEventListener('dragleave', function () { $('drop').classList.remove('drop'); });
+  d.addEventListener('drop', function (e) { e.preventDefault(); $('drop').classList.remove('drop'); openBlob(e.dataTransfer.files[0]); });
+
+  // usado pelos testes automáticos
+  window.__aula = { load: load, go: go, cmd: onCmd, cur: function () { return cur; } };
+  if (!/[?&]offline/.test(location.search)) openRoom(); else $('status').textContent = 'Modo sem internet.';
+})();
+</script>
+</body>
+</html>

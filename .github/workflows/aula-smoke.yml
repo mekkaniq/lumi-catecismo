@@ -1,0 +1,30 @@
+name: Aulas (teste ao vivo)
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['aula/**', '.github/workflows/aula-smoke.yml']
+  schedule:
+    - cron: '23 11 */3 * *'   # também mantém o projeto do Supabase ativo
+permissions:
+  contents: write
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm i --no-save playwright@1.48.2 && npx playwright install --with-deps chromium
+      - run: |
+          mkdir -p out
+          (python3 -m http.server 8765 >/dev/null 2>&1 &)
+          sleep 1
+          node aula/test/smoke.js
+      - name: Publicar resultado
+        if: always()
+        run: |
+          mkdir -p /tmp/p && cp -r out/. /tmp/p/ 2>/dev/null || true
+          cd /tmp/p && git init -q -b ci-aula && git config user.name lumi-ci && git config user.email ci@users.noreply.github.com
+          git add -A && git commit -q -m "aula smoke [skip ci]" && git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" ci-aula
