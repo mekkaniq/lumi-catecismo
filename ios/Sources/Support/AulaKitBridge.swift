@@ -43,21 +43,17 @@ final class AulaKitBridge: NSObject, WKNavigationDelegate {
         return web!
     }
 
-    nonisolated func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        Task { @MainActor in
-            self.ready = true
-            let w = self.waiting
-            self.waiting = []
-            w.forEach { $0.resume() }
-        }
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        ready = true
+        let w = waiting
+        waiting = []
+        w.forEach { $0.resume() }
     }
 
-    nonisolated func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        Task { @MainActor in
-            let w = self.waiting
-            self.waiting = []
-            w.forEach { $0.resume(throwing: error) }
-        }
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        let w = waiting
+        waiting = []
+        w.forEach { $0.resume(throwing: error) }
     }
 
     private func call(_ js: String, _ args: [String: Any]) async throws -> Any? {
