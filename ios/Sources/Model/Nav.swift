@@ -9,6 +9,8 @@ enum Route: Hashable {
     case result
     case classroom(String, Int, Int)
     case text(String)
+    case aulas
+    case aula(String)
 }
 
 @MainActor
@@ -50,7 +52,7 @@ final class Nav: ObservableObject {
     }
 
     /// Argumentos de execução usados só pelo CI para tirar capturas de cada tela.
-    func applyLaunchArguments(_ store: Store) {
+    func applyLaunchArguments(_ store: Store, aulas: AulaStore? = nil) {
         let a = ProcessInfo.processInfo.arguments
         guard let i = a.firstIndex(of: "-shot"), i + 1 < a.count else { return }
         let shot = a[i + 1]
@@ -87,6 +89,15 @@ final class Nav: ObservableObject {
             }
         case "class": path = [.book(id), .classroom(id, 0, 0)]
         case "text": path = [.text("mand")]
+        case "aulas":
+            if let aulas, aulas.aulas.isEmpty { _ = aulas.create(Aula.sample()) }
+            path = [.aulas]
+        case "aula":
+            if let aulas {
+                let x = aulas.aulas.first ?? aulas.create(Aula.sample())
+                path = [.aulas, .aula(x.id)]
+            }
+        case "aulasvazio": path = [.aulas]
         default: break
         }
     }

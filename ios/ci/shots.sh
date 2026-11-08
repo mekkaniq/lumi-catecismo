@@ -44,6 +44,21 @@ shot settings -shot hub -demo -settings
 shot class -shot class -demo
 shot class-pick -shot class -demo -classpick
 shot text -shot text -demo
+shot aulas-vazio -shot aulasvazio
+shot aulas -shot aulas
+shot aula -shot aula
+shot slide-edit -shot aula -slideedit
+shot aula-show -shot aula -present
+shot remote -shot aula -remotedemo
+# exportações (PDF, PowerPoint, arquivo da aula) geradas dentro do app
+xcrun simctl launch --terminate-running-process "$UDID" $B -shot aula -exporttest >/dev/null
+sleep 20
+DATA=$(xcrun simctl get_app_container "$UDID" $B data 2>/dev/null || true)
+if [ -n "$DATA" ] && [ -d "$DATA/Documents/export-test" ]; then
+  mkdir -p shots/export && cp "$DATA"/Documents/export-test/* shots/export/ && cat shots/export/log.txt
+else
+  echo "export-test não gerou arquivos" | tee shots/export-missing.txt
+fi
 xcrun simctl ui "$UDID" appearance dark
 shot dark-hub -shot hub -demo
 shot dark-book -shot book -book maior -demo

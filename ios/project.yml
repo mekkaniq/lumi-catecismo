@@ -19,6 +19,9 @@ targets:
     platform: iOS
     sources:
       - path: Sources
+      - path: ../aula
+        type: folder
+        buildPhase: resources
     info:
       path: Config/Info.plist
       properties:
@@ -30,6 +33,23 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         UIStatusBarStyle: UIStatusBarStyleLightContent
         UIViewControllerBasedStatusBarAppearance: false
+        LSSupportsOpeningDocumentsInPlace: false
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Aula do Verso Vivo
+            CFBundleTypeRole: Editor
+            LSHandlerRank: Owner
+            LSItemContentTypes: [br.com.editoraversovivo.aula]
+          - CFBundleTypeName: Apresentação ou PDF
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Alternate
+            LSItemContentTypes: [org.openxmlformats.presentationml.presentation, com.adobe.pdf]
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: br.com.editoraversovivo.aula
+            UTTypeDescription: Aula do Verso Vivo
+            UTTypeConformsTo: [public.data, public.content]
+            UTTypeTagSpecification:
+              public.filename-extension: [vvaula]
+              public.mime-type: [application/x-vvaula]
         UILaunchScreen:
           UIColorName: LaunchBG
           UIImageName: LaunchLumi
