@@ -1,18 +1,21 @@
 /* Verso Vivo Catecismos — funciona sem internet.
    Arquivos do app: tenta a rede (até 3 s) e guarda a cópia; sem rede, usa a cópia guardada.
    Fontes e imagens vêm do próprio site (nada de Google Fonts). Ao publicar mudança grande, troque a versão. */
-const V='verso-vivo-catecismos-v4';
-const IMG=['dica','dica-pisca','dormindo','festa','lendo','lendo-pisca','oi','oi-pisca','pensando','pensando-pisca','rosto','sarca'].map(n=>'/img/nine-'+n+'.webp');
-const CORE=['/','/index.html','/app.js','/data.js','/data-maior.js','/data-conf.js','/manifest.webmanifest','/icon-192.png','/icon-512.png','/apple-touch-icon.png',
-  '/fonts/Cinzel-Variable.woff','/fonts/Lora-Variable.woff','/fonts/Lora-Italic-Variable.woff','/img/mundo1.webp','/img/mundo2.webp','/img/mundo3.webp',...IMG];
+const V='verso-vivo-catecismos-v5';
+// Caminhos relativos à pasta do app: funciona em lumi-catecismo.vercel.app/ e em editoraversovivo.com.br/catecismos/.
+const BASE=new URL('./',self.location).pathname;
+const IMG=['dica','dica-pisca','dormindo','festa','lendo','lendo-pisca','oi','oi-pisca','pensando','pensando-pisca','rosto','sarca'].map(n=>'img/nine-'+n+'.webp');
+const CORE=['./','index.html','app.js','data.js','data-maior.js','data-conf.js','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png',
+  'fonts/Cinzel-Variable.woff','fonts/Lora-Variable.woff','fonts/Lora-Italic-Variable.woff','img/mundo1.webp','img/mundo2.webp','img/mundo3.webp',...IMG];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{
   const r=e.request;if(r.method!=='GET')return;
   const u=new URL(r.url);if(u.origin!==self.location.origin)return;
-  const asset=/^\/(fonts|img)\//.test(u.pathname);
+  if(!u.pathname.startsWith(BASE)||u.pathname.startsWith(BASE+'aula/'))return;
+  const asset=/\/(fonts|img)\//.test(u.pathname.slice(BASE.length-1));
   e.respondWith(caches.open(V).then(async c=>{
-    const key=r.mode==='navigate'?'/index.html':r;
+    const key=r.mode==='navigate'?BASE+'index.html':r;
     const hit=await c.match(key,{ignoreSearch:true});
     if(asset&&hit)return hit;
     const net=fetch(r).then(res=>{if(res&&res.ok)c.put(key,res.clone());return res});

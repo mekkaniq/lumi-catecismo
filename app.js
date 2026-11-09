@@ -81,7 +81,7 @@ const POSEWH={oi:[314,360],festa:[351,360],pensando:[299,360],dica:[360,390],len
 /* quadro de "piscar" por cima: [esquerda, topo, largura] em % da imagem */
 const BLINKWH={oi:[147,106],pensando:[144,108],dica:[149,104],lendo:[147,67]};
 const BLINK={oi:[33.76,21.67,46.82],pensando:[32.11,21.94,48.16],dica:[32.82,24.87,38.21],lendo:[29.17,33.61,40.83]};
-const IMG='/img/nine-';
+const IMG='img/nine-';
 function poseOf(mood,stage){return stage&&(mood==='idle'||mood==='happy'||mood==='meh')?'sarca':(POSE[mood]||'oi')}
 function nineHTML(mood='idle',attrs='',stage=false){
   const p=poseOf(mood,stage),b=BLINK[p];
@@ -675,7 +675,7 @@ function fromHash(){const h=(location.hash||'').slice(1);const id=ORDER.find(k=>
   document.documentElement.dataset.book=id||'hub';render();window.scrollTo(0,0)}
 window.addEventListener('hashchange',fromHash);
 applyFS();
-if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='127.0.0.1'))try{navigator.serviceWorker.register('/sw.js').catch(()=>{})}catch(e){}
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='127.0.0.1'))try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
 /* mostra a barra de rolagem só enquanto a página rola */
 let scrollT=0;window.addEventListener('scroll',()=>{document.documentElement.classList.add('scrolling');clearTimeout(scrollT);scrollT=setTimeout(()=>document.documentElement.classList.remove('scrolling'),900)},{passive:true});
 
