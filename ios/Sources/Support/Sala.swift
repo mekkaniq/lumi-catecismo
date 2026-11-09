@@ -5,7 +5,7 @@ import Foundation
 enum SalaAPI {
     static let base = URL(string: "https://tohphjpibyfikrmgswhk.supabase.co")!
     static let key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvaHBoanBpYnlmaWtybWdzd2hrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxMjYzODAsImV4cCI6MjEwOTcwMjM4MH0.pGoIL1m6unwubNwNBGhz7CzNynyfW-5yjPOrDOuSCZ0"
-    static let site = "lumi-catecismo.vercel.app/aula"
+    static let site = "editoraversovivo.com.br/aula"
 
     struct Info: Decodable {
         let existe: Bool
