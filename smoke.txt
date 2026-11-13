@@ -1,0 +1,10 @@
+sala 224470
+info {"existe":true,"online":true,"carregada":false,"quadro":0,"arquivo":null}
+upload 200 {"Key":"aulas/salas/224470/teste-1794595061333.vvaula","Id":"507eedaf-faec-477f-a8b4-ff90821e24c6","version":"debd8ca7-1275-418a-a0b4-bdc06a48d8f1"}
+sala_arquivo 200 true
+broadcast {"t":"load","file":"salas/224470/teste-1794595061333.vvaula","f":0} 202
+broadcast {"t":"go","f":2} 202
+quadro no PC 2
+info depois da seta {"existe":true,"online":true,"carregada":true,"quadro":3,"arquivo":"salas/224470/teste-1794595061333.vvaula"}
+upload fora da pasta (deve falhar) 400
+limpar 200 {"apagados":0}
