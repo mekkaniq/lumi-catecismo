@@ -64,17 +64,16 @@ body.mouse #hud{opacity:1}
     <div>
       <div class="kicker">Verso Vivo · Catecismos</div>
       <h1>Apresentar uma aula</h1>
-      <p class="lead">Deixe esta tela no projetor ou na TV. A aula vem do celular, e o celular passa os slides.</p>
+      <p class="lead">Deixe esta tela no projetor ou na TV e abra aqui o arquivo da aula.</p>
       <ol class="steps">
         <li><b>1</b><span>No app <strong>Catecismos</strong>, abra <strong>Minhas aulas</strong> e escolha a aula.</span></li>
-        <li><b>2</b><span>Toque em <strong>Apresentar → No computador</strong>.</span></li>
-        <li><b>3</b><span>Digite o código ao lado. Pronto: o celular vira o controle.</span></li>
+        <li><b>2</b><span>Envie o arquivo da aula para este computador (WhatsApp, e-mail ou pendrive).</span></li>
+        <li><b>3</b><span>Toque em <strong>Abrir arquivo da aula</strong> ao lado, ou arraste o arquivo para cá.</span></li>
       </ol>
     </div>
     <div class="codebox" id="drop">
-      <small>Código desta tela</small>
-      <div id="code">······</div>
-      <div id="status">Abrindo a sala…</div>
+      <small>Arquivo da aula</small>
+      <div id="status">Sem o arquivo? Apresente com o PDF ou o PowerPoint baixado no app.</div>
       <div class="row">
         <button class="btn" id="openFile">Abrir arquivo da aula</button>
         <button class="btn" id="fsBtn">Tela cheia</button>
@@ -92,15 +91,14 @@ body.mouse #hud{opacity:1}
 
 <script src="vendor/jszip.min.js"></script>
 <script src="aula-kit.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 (function () {
   'use strict';
-  var URL_SB = 'https://tohphjpibyfikrmgswhk.supabase.co';
-  var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvaHBoanBpYnlmaWtybWdzd2hrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxMjYzODAsImV4cCI6MjEwOTcwMjM4MH0.pGoIL1m6unwubNwNBGhz7CzNynyfW-5yjPOrDOuSCZ0';
+  // A sala (celular como controle, via Supabase) foi desligada em 16/11/2026: a aula abre só pelo arquivo.
+  var URL_SB = '';
   var K = window.AulaKit;
   var $ = function (id) { return document.getElementById(id); };
-  var sb = window.supabase ? window.supabase.createClient(URL_SB, KEY) : null;
+  var sb = null;
 
   var code = null, channel = null, aula = null, media = {}, fr = [], cur = 0, bgCache = {};
 
@@ -111,7 +109,7 @@ body.mouse #hud{opacity:1}
 
   // ---------- sala ----------
   function openRoom() {
-    if (!sb) { $('status').textContent = 'Sem internet: abra o arquivo da aula.'; return; }
+    if (!sb) { $('status').textContent = 'Sem o arquivo? Apresente com o PDF ou o PowerPoint baixado no app.'; return; }
     $('status').textContent = 'Abrindo a sala…';
     sb.rpc('nova_sala').then(function (r) {
       if (r.error || !r.data) { $('status').textContent = 'Não consegui abrir a sala. Você ainda pode abrir o arquivo da aula.'; return; }
