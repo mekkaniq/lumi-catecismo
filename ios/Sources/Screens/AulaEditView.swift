@@ -127,10 +127,8 @@ struct AulaEditView: View {
     /// Apresentar e baixar, bem à vista.
     private var actions: some View {
         HStack(spacing: 10) {
-            Menu {
-                Button { presentRemote = true } label: { Label("No computador da igreja", systemImage: "desktopcomputer") }
-                Button { presentHere = true } label: { Label("Neste aparelho", systemImage: "iphone") }
-            } label: {
+            // A sala (celular como controle do computador) foi desligada em 16/11/2026: apresenta neste aparelho.
+            Button { presentHere = true } label: {
                 Label("Apresentar", systemImage: "play.fill")
                     .font(.body.weight(.semibold))
                     .foregroundStyle(Pal.ink)
@@ -326,7 +324,7 @@ struct SlideEditor: View {
                 } header: {
                     Text("Anotações do professor")
                 } footer: {
-                    Text("Aparecem só no celular, quando ele controla a apresentação no computador.")
+                    Text("Ficam só para você, aqui no editor. Não aparecem nos slides.")
                 }
             }
             .navigationTitle(slide.kind.name)

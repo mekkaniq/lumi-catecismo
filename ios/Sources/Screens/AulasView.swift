@@ -139,7 +139,7 @@ struct AulasView: View {
                     .font(.display(.headline))
                     .foregroundStyle(Pal.fg)
                     .fixedSize(horizontal: false, vertical: true)
-                Text("Na igreja, abra **\(SalaAPI.site)** no computador e passe os slides pelo celular. Também dá para baixar em PDF ou PowerPoint.")
+                Text("Apresente aqui no aparelho, ou baixe em PDF ou PowerPoint. No computador da igreja, envie o arquivo da aula e abra em **\(SalaAPI.site)**.")
                     .font(.footnote)
                     .foregroundStyle(Pal.muted)
                     .fixedSize(horizontal: false, vertical: true)

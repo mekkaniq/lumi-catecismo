@@ -127,7 +127,7 @@ struct HubView: View {
             }
             .buttonStyle(PressStyle())
             Button { nav.push(.aulas) } label: {
-                ToolTile(title: "Minhas aulas", subtitle: "Montar slides para a aula (catecismo, Bíblia, tópicos, fotos e quiz), apresentar no computador da igreja e baixar em PDF ou PowerPoint.", icon: "rectangle.stack.badge.play", primary: false)
+                ToolTile(title: "Minhas aulas", subtitle: "Montar slides para a aula (catecismo, Bíblia, tópicos, fotos e quiz), apresentar no aparelho e baixar em PDF ou PowerPoint.", icon: "rectangle.stack.badge.play", primary: false)
             }
             .buttonStyle(PressStyle())
         }
